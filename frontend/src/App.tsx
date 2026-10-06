@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./lib/supabase";
-import CreateHousehold from "./features/household/CreateHousehold"; // NEW
-import JoinHousehold from "./features/household/JoinHousehold";
+import LoginScreen from "./features/auth/LoginScreen";
+import Onboarding from "./features/household/Onboarding";
 import HouseholdInfo from "./features/household/HouseholdInfo";
 import ShoppingList from "./features/shopping/ShoppingList";
 import TabBar, { type Tab } from "./components/TabBar";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
+  // undefined = still loading, null = user has no household yet
   const [householdId, setHouseholdId] = useState<string | null | undefined>(
     undefined,
-  ); // NEW
-  const userId = session?.user.id; // NEW
+  );
   const [tab, setTab] = useState<Tab>("shopping");
+  const userId = session?.user.id;
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -22,7 +23,7 @@ export default function App() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  // NEW: look up the user's household after login
+  // Look up the user's household after login
   useEffect(() => {
     if (!userId) return;
     supabase
@@ -39,34 +40,29 @@ export default function App() {
 
   function handleLogout() {
     supabase.auth.signOut();
-    setHouseholdId(undefined); // NEW
+    setHouseholdId(undefined);
   }
 
-  if (!session) {
-    return <button onClick={handleLogin}>Log in with Google</button>;
-  }
-
-  if (householdId === undefined) return <p>Loading…</p>; // NEW
-  if (householdId === null) {
-    return (
-      <div>
-        <CreateHousehold onCreated={setHouseholdId} />
-        <p>or</p>
-        <JoinHousehold onJoined={setHouseholdId} />
-      </div>
-    );
-  }
+  if (!session) return <LoginScreen onLogin={handleLogin} />;
+  if (householdId === undefined) return <p className="loading">Laddar…</p>;
+  if (householdId === null) return <Onboarding onReady={setHouseholdId} />;
 
   return (
-    <div>
+    <div className="app">
       <HouseholdInfo householdId={householdId} />
-      {tab === "shopping" ? (
-        <ShoppingList householdId={householdId} />
-      ) : (
-        <p className="coming-soon">Coming soon</p>
-      )}
-      <button className="logout" onClick={handleLogout}>
-        Log out
+      <main>
+        {tab === "shopping" ? (
+          <ShoppingList householdId={householdId} />
+        ) : (
+          <p className="coming-soon">Kommer snart</p>
+        )}
+      </main>
+      <button
+        type="button"
+        className="text-button logout"
+        onClick={handleLogout}
+      >
+        Logga ut
       </button>
       <TabBar active={tab} onChange={setTab} />
     </div>

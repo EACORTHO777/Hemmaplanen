@@ -1,13 +1,22 @@
-/* Design tokens: the "Forest green" theme from the Figma prototype */
+/*
+ * Design tokens
+ * Light theme: direction D (palette from octet.design "App icon")
+ * Dark theme:  direction C (lime on near-black)
+ */
 :root {
-  --color-accent: #2f6b4f;
-  --color-accent-soft: #e3efe8;
-  --color-background: #faf8f4;
-  --color-surface: #ffffff;
-  --color-text: #1f2421;
-  --color-muted: #6b7270;
-  --color-danger: #c2412d;
-  --color-border: #ebe7e0;
+  color-scheme: light;
+  --bg: #f5f4f7;
+  --surface: #ffffff;
+  --text: #1f1f1f;
+  --muted: #6b6a70;
+  --line: #e6e3ea;
+  --line-soft: #efedf2;
+  --box-line: #8c8b92;
+  --accent: #7d7f69;
+  --accent-contrast: #ffffff;
+  --highlight: #ebdbd3;
+  --highlight-ink: #6a4536;
+  --ring-track: #e6e3ea;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -17,11 +26,53 @@
   --space-6: 32px;
 
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --tab-bar-height: 64px;
+  --font-sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --tab-bar-height: 76px;
+  --quick-add-height: 58px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --content-width: 480px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0e0f11;
+    --surface: #17191c;
+    --text: #f2f3f0;
+    --muted: #8d9196;
+    --line: #2c3035;
+    --line-soft: #24272b;
+    --box-line: #4a5057;
+    --accent: #c8f05a;
+    --accent-contrast: #0e0f11;
+    --highlight: #262c1a;
+    --highlight-ink: #c8f05a;
+    --ring-track: #24272b;
+  }
+}
+
+/*
+ * Section tones: an element with `.tone` and an inline `--section` color
+ * gets a soft background, a readable text color and a strong color.
+ */
+.tone {
+  --tone-card: var(--section);
+  --tone-soft: color-mix(in srgb, var(--section) 45%, #ffffff);
+  --tone-ink: color-mix(in srgb, var(--section), #000000 66%);
+  --tone-strong: color-mix(in srgb, var(--section), #000000 38%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tone {
+    --tone-card: color-mix(in srgb, var(--section) 14%, var(--bg));
+    --tone-soft: color-mix(in srgb, var(--section) 16%, var(--surface));
+    --tone-ink: var(--section);
+    --tone-strong: var(--section);
+  }
 }
 
 /* Reset */
@@ -48,8 +99,8 @@ ul {
 /* Base */
 body {
   min-height: 100dvh;
-  background: var(--color-background);
-  color: var(--color-text);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.4;
@@ -57,10 +108,10 @@ body {
 }
 
 #root {
-  max-width: 480px;
+  max-width: var(--content-width);
   margin: 0 auto;
-  padding: var(--space-5) var(--space-4)
-    calc(var(--tab-bar-height) + var(--space-6) + env(safe-area-inset-bottom));
+  padding: var(--space-5) 20px
+    calc(var(--tab-bar-height) + var(--quick-add-height) + 120px + var(--safe-bottom));
 }
 
 /* 16px stops iPhone Safari from zooming in when a field is focused */
@@ -77,42 +128,164 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
-.app-header {
-  margin-bottom: var(--space-5);
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
+/* Typography */
 .eyebrow {
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-accent);
 }
 
-.app-header h1 {
-  font-size: 32px;
-  line-height: 1.1;
+.page-title {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 
-.invite {
+.hero-title {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+/* Buttons */
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 52px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+}
+
+.primary-button {
+  border: none;
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.secondary-button {
+  border: 2px solid var(--text);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.text-button {
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
   font-size: 14px;
-  color: var(--color-muted);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
+/* Forms */
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.form-card label {
+  font-weight: 600;
+}
+
+.form-card input {
+  height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+
+/* Full-height screens: login and onboarding */
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 80dvh;
+}
+
+.divider {
+  text-align: center;
+  color: var(--muted);
+}
+
+.loading,
+.coming-soon {
+  padding: var(--space-6) 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* App header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 32px;
+}
+
+.invite-chip {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--highlight);
+  color: var(--highlight-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.logout {
+  display: block;
+  margin: var(--space-6) auto 0;
+}
+
+/* Tab bar */
 .tab-bar {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 20;
   display: flex;
-  height: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
+  height: calc(var(--tab-bar-height) + var(--safe-bottom));
+  padding: 0 max(0px, calc((100% - var(--content-width)) / 2)) calc(14px + var(--safe-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--line);
 }
 
 .tab {
@@ -121,28 +294,28 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   border: none;
   background: none;
-  color: var(--color-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 30px;
+  border-radius: var(--radius-pill);
 }
 
 .tab.active {
-  color: var(--color-accent);
-  font-weight: 600;
+  color: var(--highlight-ink);
+  font-weight: 700;
 }
 
-.coming-soon {
-  padding: var(--space-6) 0;
-  text-align: center;
-  color: var(--color-muted);
-}
-
-.logout {
-  border: none;
-  background: none;
-  color: var(--color-muted);
-  font-size: 14px;
-  text-decoration: underline;
+.tab.active .tab-icon {
+  background: var(--highlight);
 }

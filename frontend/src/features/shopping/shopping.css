@@ -1,74 +1,277 @@
-.section-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  margin-bottom: var(--space-4);
+/* Summary: progress ring + title */
+.shopping-summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: var(--space-5);
 }
 
-.section-card h3 {
+.summary-text {
+  margin-top: var(--space-2);
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.ring {
+  position: relative;
+  flex-shrink: 0;
+  width: 112px;
+  height: 112px;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track,
+.ring-segment {
+  fill: none;
+  stroke-width: 12;
+}
+
+.ring-track {
+  stroke: var(--ring-track);
+}
+
+.ring-segment {
+  stroke: var(--tone-strong);
+}
+
+.ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-count {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.ring-unit {
+  margin-top: 2px;
+  color: var(--muted);
   font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-muted);
-  margin-bottom: var(--space-2);
+  font-weight: 500;
 }
 
-.item-row + .item-row {
-  border-top: 1px solid var(--color-border);
+/* Chips: section filter and category picker */
+.filter-chips,
+.category-picker {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filter-chips {
+  margin: 22px -20px 0;
+  padding: 0 20px;
+}
+
+.chip {
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 14px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--tone-soft);
+  color: var(--tone-ink);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--tone-ink);
+}
+
+.chip-all {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.chip-all[aria-pressed="true"] {
+  border-color: var(--text);
+}
+
+.chip-small {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+/* Section cards: the whole card takes the section color (from direction B) */
+.section-card {
+  margin-top: 14px;
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  border-radius: 28px;
+  background: var(--tone-card);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 10px;
+  color: var(--tone-ink);
+}
+
+.section-head h2 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section-left {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .item-row label {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) 0;
+  gap: 14px;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: var(--surface);
+  cursor: pointer;
 }
 
-.item-row input[type='checkbox'] {
-  width: 22px;
-  height: 22px;
-  accent-color: var(--color-accent);
-}
-
-.item-amount {
-  margin-left: auto;
-  color: var(--color-muted);
-  font-size: 14px;
+.item-name {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 500;
 }
 
 .item-row.done .item-name {
+  color: var(--muted);
   text-decoration: line-through;
-  color: var(--color-muted);
 }
 
-.add-form {
+.item-qty {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--tone-soft);
+  color: var(--tone-ink);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Custom checkbox: still a real <input>, so keyboard and screen readers work */
+.item-check {
+  appearance: none;
+  -webkit-appearance: none;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--space-2);
-}
-
-.add-form .add-name,
-.add-form button {
-  grid-column: 1 / -1;
-}
-
-.add-form input,
-.add-form select {
-  width: 100%;
-  height: 44px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-border);
+  place-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  border: 2px solid var(--box-line);
   border-radius: var(--radius-sm);
-  background: var(--color-background);
+  background: var(--surface);
+  cursor: pointer;
 }
 
-.add-form button {
-  height: 48px;
+.item-check::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: var(--tone-ink);
+  transform: scale(0);
+  transition: transform 120ms ease-out;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+.item-check:checked {
+  border-color: var(--tone-ink);
+  background: var(--tone-soft);
+}
+
+.item-check:checked::before {
+  transform: scale(1);
+}
+
+.empty-state {
+  margin-top: var(--space-6);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Quick add: fixed above the tab bar */
+.quick-add {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tab-bar-height) + var(--safe-bottom));
+  z-index: 10;
+  padding: 28px max(16px, calc((100% - var(--content-width)) / 2 + 16px)) var(--space-3);
+  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+}
+
+.category-picker {
+  margin-bottom: 10px;
+}
+
+.quick-add-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--quick-add-height);
+  padding: 0 6px 0 18px;
+  background: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: var(--radius-lg);
+}
+
+.quick-add-bar:focus-within {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.quick-add-bar input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: none;
+  background: transparent;
+  font-size: 17px;
+  outline: none;
+}
+
+.quick-add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-surface);
-  font-weight: 600;
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
+.quick-add-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

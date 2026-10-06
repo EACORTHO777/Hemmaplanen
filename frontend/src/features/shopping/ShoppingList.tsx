@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-import type { Database } from "../../types/database";
-import AddItemForm from "./AddItemForm";
 import ItemRow from "./ItemRow";
-import { SECTIONS } from "./options";
+import ProgressRing from "./ProgressRing";
+import QuickAdd from "./QuickAdd";
+import { OTHER_SECTION, SECTIONS, sectionFor, toneStyle } from "./options";
+import type { Item } from "./types";
 import "./shopping.css";
-
-type Item = Database["public"]["Tables"]["shopping_items"]["Row"];
 
 type Props = {
   householdId: string;
@@ -14,6 +13,7 @@ type Props = {
 
 export default function ShoppingList({ householdId }: Props) {
   const [items, setItems] = useState<Item[]>([]);
+  const [filter, setFilter] = useState<string | null>(null);
 
   useEffect(() => {
     function fetchItems() {
@@ -67,56 +67,100 @@ export default function ShoppingList({ householdId }: Props) {
     setItems(items.filter((i) => !i.done));
   }
 
-  const active = items.filter((i) => !i.done);
-  const done = items.filter((i) => i.done);
-  const known = SECTIONS.flatMap((s) => s.categories);
-  const other = active.filter((i) => !known.includes(i.category ?? ""));
+  function addItem(item: Item) {
+    setItems((prev) => (prev.some((i) => i.id === item.id) ? prev : [...prev, item]));
+  }
+
+  const doneCount = items.filter((i) => i.done).length;
+  const remaining = items.length - doneCount;
+
+  // Group items by store section, unchecked items first
+  const groups = [...SECTIONS, OTHER_SECTION]
+    .map((section) => {
+      const inSection = items.filter((i) => sectionFor(i.category) === section);
+      const open = inSection.filter((i) => !i.done);
+      const done = inSection.filter((i) => i.done);
+      return { section, items: [...open, ...done], left: open.length, done: done.length };
+    })
+    .filter((group) => group.items.length > 0);
+
+  const activeFilter = groups.some((g) => g.section.title === filter) ? filter : null;
+  const visibleGroups = activeFilter
+    ? groups.filter((g) => g.section.title === activeFilter)
+    : groups;
+  const segments = groups
+    .filter((g) => g.done > 0)
+    .map((g) => ({ color: g.section.color, count: g.done }));
 
   return (
-    <div>
-      <AddItemForm
-        householdId={householdId}
-        onAdded={(item) => setItems([...items, item])}
-      />
-      {SECTIONS.map((section) => {
-        const list = active.filter((i) =>
-          section.categories.includes(i.category ?? ""),
-        );
-        if (list.length === 0) return null;
-        return (
-          <section key={section.title} className="section-card">
-            <h3>{section.title}</h3>
-            <ul>
-              {list.map((item) => (
-                <ItemRow key={item.id} item={item} onToggle={toggleItem} />
-              ))}
-            </ul>
-          </section>
-        );
-      })}
+    <>
+      <section className="shopping-summary" aria-label="Översikt">
+        <ProgressRing segments={segments} total={items.length} remaining={remaining} />
+        <div>
+          <h1 className="page-title">Handla</h1>
+          <p className="summary-text">
+            {doneCount} av {items.length} i korgen
+          </p>
+          {doneCount > 0 && (
+            <button type="button" className="text-button" onClick={clearDone}>
+              Rensa klara ({doneCount})
+            </button>
+          )}
+        </div>
+      </section>
 
-      {other.length > 0 && (
-        <section className="section-card">
-          <h3>Övrigt</h3>
-          <ul>
-            {other.map((item) => (
+      {groups.length > 1 && (
+        <div className="filter-chips" role="group" aria-label="Visa avdelning">
+          <button
+            type="button"
+            className="chip chip-all"
+            aria-pressed={activeFilter === null}
+            onClick={() => setFilter(null)}
+          >
+            Alla {items.length}
+          </button>
+          {groups.map((g) => (
+            <button
+              key={g.section.title}
+              type="button"
+              className="chip tone"
+              style={toneStyle(g.section.color)}
+              aria-pressed={activeFilter === g.section.title}
+              onClick={() =>
+                setFilter(activeFilter === g.section.title ? null : g.section.title)
+              }
+            >
+              {g.section.short} {g.items.length}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {items.length === 0 && (
+        <p className="empty-state">
+          Listan är tom. Skriv i fältet längst ner för att lägga till något.
+        </p>
+      )}
+
+      {visibleGroups.map((g) => (
+        <section
+          key={g.section.title}
+          className="section-card tone"
+          style={toneStyle(g.section.color)}
+        >
+          <div className="section-head">
+            <h2>{g.section.title}</h2>
+            <span className="section-left">{g.left > 0 ? `${g.left} kvar` : "Klart"}</span>
+          </div>
+          <ul className="item-list">
+            {g.items.map((item) => (
               <ItemRow key={item.id} item={item} onToggle={toggleItem} />
             ))}
           </ul>
         </section>
-      )}
+      ))}
 
-      {done.length > 0 && (
-        <section className="section-card">
-          <h3>Klar</h3>
-          <ul>
-            {done.map((item) => (
-              <ItemRow key={item.id} item={item} onToggle={toggleItem} />
-            ))}
-          </ul>
-          <button onClick={clearDone}>Clear checked</button>
-        </section>
-      )}
-    </div>
+      <QuickAdd householdId={householdId} onAdded={addItem} />
+    </>
   );
 }
