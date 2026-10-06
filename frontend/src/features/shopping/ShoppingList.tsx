@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
 import AddItemForm from "./AddItemForm";
+import ItemRow from "./ItemRow";
+import { SECTIONS } from "./options";
 
 type Item = Database["public"]["Tables"]["shopping_items"]["Row"];
 
@@ -64,27 +66,56 @@ export default function ShoppingList({ householdId }: Props) {
     setItems(items.filter((i) => !i.done));
   }
 
+  const active = items.filter((i) => !i.done);
+  const done = items.filter((i) => i.done);
+  const known = SECTIONS.flatMap((s) => s.categories);
+  const other = active.filter((i) => !known.includes(i.category ?? ""));
+
   return (
     <div>
       <AddItemForm
         householdId={householdId}
         onAdded={(item) => setItems([...items, item])}
       />
-      <ul>
-        {items.map((item) => (
-          <li key={item.id}>
-            <label>
-              <input
-                type="checkbox"
-                checked={item.done}
-                onChange={() => toggleItem(item)}
-              />
-              {item.name}
-            </label>
-          </li>
-        ))}
-      </ul>
-      <button onClick={clearDone}>Clear checked</button>
+      {SECTIONS.map((section) => {
+        const list = active.filter((i) =>
+          section.categories.includes(i.category ?? ""),
+        );
+        if (list.length === 0) return null;
+        return (
+          <section key={section.title}>
+            <h3>{section.title}</h3>
+            <ul>
+              {list.map((item) => (
+                <ItemRow key={item.id} item={item} onToggle={toggleItem} />
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+
+      {other.length > 0 && (
+        <section>
+          <h3>Övrigt</h3>
+          <ul>
+            {other.map((item) => (
+              <ItemRow key={item.id} item={item} onToggle={toggleItem} />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {done.length > 0 && (
+        <section>
+          <h3>Klar</h3>
+          <ul>
+            {done.map((item) => (
+              <ItemRow key={item.id} item={item} onToggle={toggleItem} />
+            ))}
+          </ul>
+          <button onClick={clearDone}>Clear checked</button>
+        </section>
+      )}
     </div>
   );
 }
