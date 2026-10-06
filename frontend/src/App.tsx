@@ -7,6 +7,7 @@ import HouseholdInfo from "./features/household/HouseholdInfo";
 import ShoppingList from "./features/shopping/ShoppingList";
 import TabBar, { type Tab } from "./components/TabBar";
 import TodoList from "./features/todos/TodoList";
+import CalendarScreen from "./features/calendar/CalendarScreen";
 import HouseholdScreen from "./features/household/HouseholdScreen";
 
 export default function App() {
@@ -71,7 +72,8 @@ export default function App() {
           <>
             {tab === "shopping" && <ShoppingList householdId={householdId} />}
             {tab === "todos" && <TodoList householdId={householdId} />}
-            {(tab === "calendar" || tab === "medicine") && (
+            {tab === "calendar" && <CalendarScreen householdId={householdId} />}
+          {tab === "medicine" && (
               <p className="coming-soon">Kommer snart</p>
             )}
           </>
