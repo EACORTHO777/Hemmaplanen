@@ -15,6 +15,7 @@ type Props = {
 export default function TodoList({ householdId }: Props) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [filter, setFilter] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -95,6 +96,13 @@ export default function TodoList({ householdId }: Props) {
     })
     .filter((group) => group.todos.length > 0);
 
+  const activeFilter = groups.some((g) => g.person.name === filter)
+    ? filter
+    : null;
+  const visibleGroups = activeFilter
+    ? groups.filter((g) => g.person.name === activeFilter)
+    : groups;
+
   return (
     <>
       <section className="shopping-summary">
@@ -108,12 +116,38 @@ export default function TodoList({ householdId }: Props) {
           )}
         </div>
       </section>
+      {groups.length > 1 && (
+        <div className="filter-chips" role="group" aria-label="Visa person">
+          <button
+            type="button"
+            className="chip chip-all"
+            aria-pressed={activeFilter === null}
+            onClick={() => setFilter(null)}
+          >
+            Alla {todos.length}
+          </button>
+          {groups.map((g) => (
+            <button
+              key={g.person.name}
+              type="button"
+              className="chip tone"
+              style={toneStyle(g.person.color)}
+              aria-pressed={activeFilter === g.person.name}
+              onClick={() =>
+                setFilter(activeFilter === g.person.name ? null : g.person.name)
+              }
+            >
+              {g.person.name} {g.left}
+            </button>
+          ))}
+        </div>
+      )}
 
       {todos.length === 0 && (
         <p className="empty-state">Inget att göra just nu. 🎉</p>
       )}
 
-      {groups.map((g) => (
+      {visibleGroups.map((g) => (
         <section
           key={g.person.name}
           className="section-card tone"
@@ -145,7 +179,6 @@ export default function TodoList({ householdId }: Props) {
           </ul>
         </section>
       ))}
-
       <AddTodo householdId={householdId} people={people} />
     </>
   );
