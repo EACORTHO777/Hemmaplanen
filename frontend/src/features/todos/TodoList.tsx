@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { toneStyle } from "../shopping/options";
 import type { Database } from "../../types/database";
+import AddTodo from "./AddTodo";
 
 type Todo = Database["public"]["Tables"]["todos"]["Row"];
+type Member = Database["public"]["Tables"]["members"]["Row"];
 
 type Props = {
   householdId: string;
@@ -11,6 +13,16 @@ type Props = {
 
 export default function TodoList({ householdId }: Props) {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("members")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("created_at")
+      .then(({ data }) => setMembers(data ?? []));
+  }, [householdId]);
 
   useEffect(() => {
     function fetchTodos() {
@@ -64,6 +76,10 @@ export default function TodoList({ householdId }: Props) {
     setTodos(todos.filter((t) => !t.done));
   }
 
+  function firstName(memberId: string) {
+    return members.find((m) => m.id === memberId)?.display_name.split("")[0];
+  }
+
   const open = todos.filter((t) => !t.done);
   const done = todos.filter((t) => t.done);
 
@@ -99,12 +115,18 @@ export default function TodoList({ householdId }: Props) {
                     onChange={() => toggleTodo(todo)}
                   />
                   <span className="item-name">{todo.title}</span>
+                  {todo.assigned_to && (
+                    <span className="item-qty">
+                      {firstName(todo.assigned_to)}
+                    </span>
+                  )}
                 </label>
               </li>
             ))}
           </ul>
         </section>
       )}
+      <AddTodo householdId={householdId} members={members} />
     </>
   );
 }
