@@ -5,6 +5,8 @@ import type { Database } from "../../types/database";
 import { EVERYONE, toPeople } from "../household/people";
 import { addDays, fromIsoDate, isoWeek, longDate, toIsoDate } from "./dates";
 import MonthGrid from "./MonthGrid";
+import DayEvents from "./DayEvents";
+import AddEvent from "./AddEvent";
 import "./calendar.css";
 
 type CalendarEvent = Database["public"]["Tables"]["events"]["Row"];
@@ -135,6 +137,15 @@ export default function CalendarScreen({ householdId }: Props) {
         onSelect={setSelected}
         onChangeMonth={changeMonth}
       />
+
+      <DayEvents
+        date={selected}
+        events={events.filter((e) => e.date === selected)}
+        people={people}
+        info={swedishDays.get(selected)}
+      />
+
+      <AddEvent householdId={householdId} date={selected} people={people} />
     </>
   );
 }

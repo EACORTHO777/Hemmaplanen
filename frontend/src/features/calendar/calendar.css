@@ -142,3 +142,63 @@
   border-radius: 50%;
   background: var(--tone-strong);
 }
+
+/* Selected day */
+.day-panel-head {
+  padding: 0 6px 10px;
+  color: var(--tone-ink);
+}
+
+.day-panel-head h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.day-details {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.day-empty {
+  padding: var(--space-3) 6px var(--space-2);
+  color: var(--muted);
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 4px 0 14px;
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.event-time {
+  flex-shrink: 0;
+  width: 52px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-chip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 36px;
+  padding: 0 10px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.time-chip input {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+}
