@@ -63,17 +63,48 @@ isOneToOne: false
                   ]
                 },"medicine_logs": {
                   Row: {
-                    "given_at": string,"given_by": string | null,"household_id": string,"id": string,"medicine": string
+                    "given_at": string,"given_by": string | null,"given_to": string,"household_id": string,"id": string,"medicine_id": string
                   }
                   Insert: {
-                    "given_at"?: string,"given_by"?: string | null,"household_id": string,"id"?: string,"medicine": string
+                    "given_at"?: string,"given_by"?: string | null,"given_to": string,"household_id": string,"id"?: string,"medicine_id": string
                   }
                   Update: {
-                    "given_at"?: string,"given_by"?: string | null,"household_id"?: string,"id"?: string,"medicine"?: string
+                    "given_at"?: string,"given_by"?: string | null,"given_to"?: string,"household_id"?: string,"id"?: string,"medicine_id"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "medicine_logs_given_to_fkey"
+      columns: ["household_id","given_to"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
+    },{
       foreignKeyName: "medicine_logs_household_id_fkey"
+      columns: ["household_id"]
+isOneToOne: false
+      referencedRelation: "households"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "medicine_logs_medicine_fkey"
+      columns: ["household_id","medicine_id"]
+isOneToOne: false
+      referencedRelation: "medicines"
+      referencedColumns: ["household_id","id"]
+    }
+                  ]
+                },"medicines": {
+                  Row: {
+                    "color": string,"created_at": string,"household_id": string,"id": string,"min_interval_minutes": number,"name": string
+                  }
+                  Insert: {
+                    "color": string,"created_at"?: string,"household_id": string,"id"?: string,"min_interval_minutes": number,"name": string
+                  }
+                  Update: {
+                    "color"?: string,"created_at"?: string,"household_id"?: string,"id"?: string,"min_interval_minutes"?: number,"name"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "medicines_household_id_fkey"
       columns: ["household_id"]
 isOneToOne: false
       referencedRelation: "households"

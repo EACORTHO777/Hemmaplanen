@@ -1,10 +1,11 @@
 /* Big week number + name day banner */
 .calendar-hero {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-4);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
   margin-top: var(--space-5);
+  text-align: center;
 }
 
 .week-number {
@@ -26,11 +27,11 @@
 .today-label {
   color: var(--muted);
   font-size: 15px;
-  text-align: right;
 }
 
 .nameday-banner {
   margin-top: var(--space-4);
+  text-align: center;
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--highlight);
