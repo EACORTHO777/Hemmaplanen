@@ -1,18 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { Plus } from "lucide-react";
 import { supabase } from "../../lib/supabase";
-import type { Database } from "../../types/database";
-
-type Member = Database["public"]["Tables"]["members"]["Row"];
+import type { Person } from "../household/people";
+import { toneStyle } from "../shopping/options";
 
 type Props = {
   householdId: string;
-  members: Member[];
+  people: Person[];
 };
 
-export default function AddTodo({ householdId, members }: Props) {
+export default function AddTodo({ householdId, people }: Props) {
   const [title, setTitle] = useState("");
-  // null = everyone
+  // null = shared by everyone
   const [assignedTo, setAssignedTo] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -44,17 +43,18 @@ export default function AddTodo({ householdId, members }: Props) {
             aria-pressed={assignedTo === null}
             onClick={() => setAssignedTo(null)}
           >
-            Alla
+            Gemensamt
           </button>
-          {members.map((m) => (
+          {people.map((p) => (
             <button
-              key={m.id}
+              key={p.id}
               type="button"
-              className="chip chip-all"
-              aria-pressed={assignedTo === m.id}
-              onClick={() => setAssignedTo(m.id)}
+              className="chip tone"
+              style={toneStyle(p.color)}
+              aria-pressed={assignedTo === p.id}
+              onClick={() => setAssignedTo(p.id)}
             >
-              {m.display_name.split(" ")[0]}
+              {p.name}
             </button>
           ))}
         </div>

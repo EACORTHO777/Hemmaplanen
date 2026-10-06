@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { toneStyle } from "../shopping/options";
 import type { Database } from "../../types/database";
 import AddTodo from "./AddTodo";
+import { EVERYONE, toPeople } from "../household/people";
 
 type Todo = Database["public"]["Tables"]["todos"]["Row"];
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -76,12 +77,23 @@ export default function TodoList({ householdId }: Props) {
     setTodos(todos.filter((t) => !t.done));
   }
 
-  function firstName(memberId: string) {
-    return members.find((m) => m.id === memberId)?.display_name.split("")[0];
-  }
-
+  const people = toPeople(members);
   const open = todos.filter((t) => !t.done);
   const done = todos.filter((t) => t.done);
+
+  // One card per person, plus "Alla" for to-dos assigned to nobody
+  const groups = [...people, EVERYONE]
+    .map((person) => {
+      const mine = todos.filter((t) => t.assigned_to === person.id);
+      const mineOpen = mine.filter((t) => !t.done);
+      const mineDone = mine.filter((t) => t.done);
+      return {
+        person,
+        todos: [...mineOpen, ...mineDone],
+        left: mineOpen.length,
+      };
+    })
+    .filter((group) => group.todos.length > 0);
 
   return (
     <>
@@ -97,12 +109,24 @@ export default function TodoList({ householdId }: Props) {
         </div>
       </section>
 
-      {todos.length === 0 ? (
+      {todos.length === 0 && (
         <p className="empty-state">Inget att göra just nu. 🎉</p>
-      ) : (
-        <section className="section-card tone" style={toneStyle("#EBDBD3")}>
+      )}
+
+      {groups.map((g) => (
+        <section
+          key={g.person.name}
+          className="section-card tone"
+          style={toneStyle(g.person.color)}
+        >
+          <div className="section-head">
+            <h2>{g.person.name}</h2>
+            <span className="section-left">
+              {g.left > 0 ? `${g.left} kvar` : "Klart"}
+            </span>
+          </div>
           <ul className="item-list">
-            {[...open, ...done].map((todo) => (
+            {g.todos.map((todo) => (
               <li
                 key={todo.id}
                 className={todo.done ? "item-row done" : "item-row"}
@@ -115,18 +139,14 @@ export default function TodoList({ householdId }: Props) {
                     onChange={() => toggleTodo(todo)}
                   />
                   <span className="item-name">{todo.title}</span>
-                  {todo.assigned_to && (
-                    <span className="item-qty">
-                      {firstName(todo.assigned_to)}
-                    </span>
-                  )}
                 </label>
               </li>
             ))}
           </ul>
         </section>
-      )}
-      <AddTodo householdId={householdId} members={members} />
+      ))}
+
+      <AddTodo householdId={householdId} people={people} />
     </>
   );
 }

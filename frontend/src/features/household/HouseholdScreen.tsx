@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Trash2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
+import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 type Member = Database["public"]["Tables"]["members"]["Row"];
 
@@ -43,6 +43,25 @@ export default function HouseholdScreen({
     }
     setMembers([...members, data]);
     setName("");
+  }
+
+  async function renameMember(member: Member) {
+    const newName = prompt("Nytt namn", member.display_name)?.trim();
+    if (!newName || newName === member.display_name) return;
+
+    const { error } = await supabase
+      .from("members")
+      .update({ display_name: newName })
+      .eq("id", member.id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    setMembers(
+      members.map((m) =>
+        m.id === member.id ? { ...m, display_name: newName } : m,
+      ),
+    );
   }
 
   async function removeMember(member: Member) {
@@ -90,6 +109,15 @@ export default function HouseholdScreen({
                 {member.user_id ? "Har inloggning" : "Utan inloggning"}
               </span>
             </span>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`Byt namn på ${member.display_name}`}
+              onClick={() => renameMember(member)}
+            >
+              <Pencil size={18} aria-hidden />
+            </button>
+
             <button
               type="button"
               className="icon-button"
