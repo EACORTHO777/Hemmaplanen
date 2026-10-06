@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
 
+
 type Props = {
   onCreated: (householdId: string) => void
 }

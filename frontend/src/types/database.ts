@@ -44,13 +44,13 @@ isOneToOne: false
                   ]
                 },"households": {
                   Row: {
-                    "created_at": string,"id": string,"name": string
+                    "created_at": string,"id": string,"invite_code": string,"name": string
                   }
                   Insert: {
-                    "created_at"?: string,"id"?: string,"name": string
+                    "created_at"?: string,"id"?: string,"invite_code"?: string,"name": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"name"?: string
+                    "created_at"?: string,"id"?: string,"invite_code"?: string,"name"?: string
                   }
                   Relationships: [
                     
@@ -142,6 +142,9 @@ isOneToOne: false
                            },
 "is_household_member":
 { Args: { "hid": string }; Returns: boolean
+                           },
+"join_household":
+{ Args: { "code": string }; Returns: string
                            }
           }
           Enums: {
