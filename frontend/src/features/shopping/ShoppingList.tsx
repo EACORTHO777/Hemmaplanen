@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
+import AddItemForm from "./AddItemForm";
 
 type Item = Database["public"]["Tables"]["shopping_items"]["Row"];
 
@@ -21,10 +22,16 @@ export default function ShoppingList({ householdId }: Props) {
   }, [householdId]);
 
   return (
-    <ul>
-      {items.map((item) => (
-        <li key={item.id}>{item.name}</li>
-      ))}
-    </ul>
+    <div>
+      <AddItemForm
+        householdId={householdId}
+        onAdded={(item) => setItems([...items, item])}
+      />
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
