@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
+import InviteCard from "./InviteCard";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -20,6 +21,18 @@ export default function HouseholdScreen({
 }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
   const [name, setName] = useState("");
+  const [householdName, setHouseholdName] = useState("");
+
+  useEffect(() => {
+    supabase
+      .from("households")
+      .select("name")
+      .eq("id", householdId)
+      .single()
+      .then(({ data }) => {
+        if (data) setHouseholdName(data.name);
+      });
+  }, [householdId]);
 
   useEffect(() => {
     supabase
@@ -92,7 +105,8 @@ export default function HouseholdScreen({
         <ArrowLeft size={20} aria-hidden />
         Tillbaka
       </button>
-      <h1 className="page-title">Hushållet</h1>
+      <p className="eyebrow screen-eyebrow">Hushåll</p>
+      <h1 className="page-title screen-title">{householdName}</h1>
 
       <ul className="member-list">
         {members.map((member) => (
@@ -129,6 +143,8 @@ export default function HouseholdScreen({
           </li>
         ))}
       </ul>
+
+      <InviteCard householdId={householdId} />
 
       <form className="form-card" onSubmit={addMember}>
         <label htmlFor="member-name">Lägg till person utan inloggning</label>

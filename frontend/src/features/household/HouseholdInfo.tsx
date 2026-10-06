@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Users } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 type Props = {
@@ -9,51 +8,28 @@ type Props = {
 
 export default function HouseholdInfo({ householdId, onOpenHousehold }: Props) {
   const [name, setName] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     supabase
       .from("households")
-      .select("name, invite_code")
+      .select("name")
       .eq("id", householdId)
       .single()
       .then(({ data }) => {
-        if (!data) return;
-        setName(data.name);
-        setInviteCode(data.invite_code);
+        if (data) setName(data.name);
       });
   }, [householdId]);
 
-  async function copyCode() {
-    await navigator.clipboard.writeText(inviteCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
   return (
     <header className="app-header">
-      <p className="eyebrow">{name}</p>
-      <div className="header-actions">
-      {inviteCode && (
-        <button
-          type="button"
-          className="invite-chip"
-          onClick={copyCode}
-          aria-label={`Inbjudningskod ${inviteCode}. Tryck för att kopiera.`}
-        >
-          {copied ? "Kopierad!" : `Kod ${inviteCode}`}
-        </button>
-      )}
       <button
         type="button"
-        className="icon-button"
+        className="household-avatar"
         onClick={onOpenHousehold}
-        aria-label="Hushållets medlemmar"
+        aria-label={`Hushållet ${name}. Visa medlemmar och inbjudningskod.`}
       >
-        <Users size={20} aria-hidden />
+        {name.charAt(0)}
       </button>
-      </div>
     </header>
   );
 }

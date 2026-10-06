@@ -1,14 +1,21 @@
-export type Medicine = {
-  id: "alvedon" | "ipren"; // must match the check constraint on medicine_logs
-  name: string;
-  color: string;
-};
+import type { Database } from "../../types/database";
 
-export const MEDICINES: Medicine[] = [
-  { id: "alvedon", name: "Alvedon", color: "#C3D8F0" },
-  { id: "ipren", name: "Ipren", color: "#C9E2B3" },
+export type Medicine = Database["public"]["Tables"]["medicines"]["Row"];
+
+// Quick picks for a new medicine, from the same soft palette as the rest of the app
+export const MEDICINE_COLORS = [
+  "#C3D8F0",
+  "#C9E2B3",
+  "#F2C4BE",
+  "#F0DC9E",
+  "#DCD1EE",
+  "#BCE1E3",
+  "#D9C2A7",
 ];
 
-export function medicineName(id: string) {
-  return MEDICINES.find((m) => m.id === id)?.name ?? id;
+export function formatInterval(minutes: number) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) return `${rest} min`;
+  return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
 }

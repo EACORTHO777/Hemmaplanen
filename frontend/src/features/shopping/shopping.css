@@ -1,9 +1,12 @@
 /* Summary: progress ring + title */
+/* Page heading, centered on every tab */
 .shopping-summary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 18px;
   margin-top: var(--space-5);
+  text-align: center;
 }
 
 .summary-text {
@@ -74,6 +77,15 @@
 .filter-chips {
   margin: 22px -20px 0;
   padding: 0 20px;
+}
+
+/* Centered when they fit, still scrollable when they don't */
+.filter-chips > :first-child {
+  margin-left: auto;
+}
+
+.filter-chips > :last-child {
+  margin-right: auto;
 }
 
 .chip {

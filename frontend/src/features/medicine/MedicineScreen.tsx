@@ -4,8 +4,9 @@ import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
 import { toPeople } from "../household/people";
 import { toneStyle } from "../shopping/options";
+import ManageMedicines from "./ManageMedicines";
 import MedicineCard from "./MedicineCard";
-import { MEDICINES, medicineName, type Medicine } from "./medicines";
+import type { Medicine } from "./medicines";
 import "./medicine.css";
 
 type Log = Database["public"]["Tables"]["medicine_logs"]["Row"];
@@ -28,6 +29,7 @@ function dateTime(iso: string) {
 export default function MedicineScreen({ householdId }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [personId, setPersonId] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -44,6 +46,31 @@ export default function MedicineScreen({ householdId }: Props) {
       .eq("household_id", householdId)
       .order("created_at")
       .then(({ data }) => setMembers(data ?? []));
+  }, [householdId]);
+
+  useEffect(() => {
+    function fetchMedicines() {
+      supabase
+        .from("medicines")
+        .select("*")
+        .eq("household_id", householdId)
+        .order("created_at")
+        .then(({ data }) => setMedicines(data ?? []));
+    }
+
+    fetchMedicines();
+    const channel = supabase
+      .channel(`medicines:${householdId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "medicines" },
+        () => fetchMedicines(),
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [householdId]);
 
   useEffect(() => {
@@ -79,25 +106,24 @@ export default function MedicineScreen({ householdId }: Props) {
   const person = people.find((p) => p.id === activeId);
   const personLogs = logs.filter((log) => log.given_to === activeId);
 
+  function medicineName(medicineId: string) {
+    return medicines.find((m) => m.id === medicineId)?.name ?? "Borttagen medicin";
+  }
+
   function nameOfUser(userId: string | null) {
     return members.find((m) => m.user_id === userId)?.display_name ?? null;
   }
 
-  async function give(medicine: Medicine, givenAt?: Date) {
+  // The card already asked for confirmation and a time
+  async function give(medicine: Medicine, givenAt: Date) {
     if (!person?.id) return;
-    const when = givenAt
-      ? ` kl ${givenAt.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}`
-      : "";
-    if (!confirm(`Är du säker på att du gav ${medicine.name} till ${person.name}${when}?`)) return;
-
     const { error } = await supabase.from("medicine_logs").insert({
       household_id: householdId,
-      medicine: medicine.id,
+      medicine_id: medicine.id,
       given_to: person.id,
-      // Leaving it out lets the database use now()
-      given_at: givenAt?.toISOString(),
+      given_at: givenAt.toISOString(),
     });
-    // The database refuses doses closer than 4 hours, even if the button was enabled
+    // The database refuses doses closer than the medicine allows
     if (error) alert(error.message);
   }
 
@@ -109,8 +135,15 @@ export default function MedicineScreen({ householdId }: Props) {
     if (error) alert(error.message);
   }
 
+  async function removeMedicine(medicine: Medicine) {
+    const question = `Ta bort ${medicine.name}? All historik för ${medicine.name} försvinner också.`;
+    if (!confirm(question)) return;
+    const { error } = await supabase.from("medicines").delete().eq("id", medicine.id);
+    if (error) alert(error.message);
+  }
+
   async function removeLog(log: Log) {
-    if (!confirm(`Ta bort ${medicineName(log.medicine)} ${dateTime(log.given_at)}?`)) return;
+    if (!confirm(`Ta bort ${medicineName(log.medicine_id)} ${dateTime(log.given_at)}?`)) return;
     const { error } = await supabase.from("medicine_logs").delete().eq("id", log.id);
     if (error) alert(error.message);
   }
@@ -142,14 +175,16 @@ export default function MedicineScreen({ householdId }: Props) {
       )}
 
       {person &&
-        MEDICINES.map((medicine) => {
-          const last = personLogs.find((log) => log.medicine === medicine.id);
+        medicines.map((medicine) => {
+          const last = personLogs.find((log) => log.medicine_id === medicine.id);
           return (
             <MedicineCard
               key={medicine.id}
               medicine={medicine}
               personName={person.name}
-              lastGivenAt={last?.given_at ?? null}
+              doseTimes={personLogs
+                .filter((log) => log.medicine_id === medicine.id)
+                .map((log) => log.given_at)}
               lastGivenBy={last ? nameOfUser(last.given_by) : null}
               now={now}
               onGive={(givenAt) => give(medicine, givenAt)}
@@ -157,6 +192,12 @@ export default function MedicineScreen({ householdId }: Props) {
             />
           );
         })}
+
+      <ManageMedicines
+        householdId={householdId}
+        medicines={medicines}
+        onRemove={removeMedicine}
+      />
 
       {personLogs.length > 0 && (
         <section className="medicine-history">
@@ -166,7 +207,7 @@ export default function MedicineScreen({ householdId }: Props) {
               <li key={log.id} className="history-row">
                 <span className="history-when">{dateTime(log.given_at)}</span>
                 <span className="history-what">
-                  {medicineName(log.medicine)}
+                  {medicineName(log.medicine_id)}
                   {nameOfUser(log.given_by) && (
                     <span className="history-by"> · gav: {nameOfUser(log.given_by)}</span>
                   )}
@@ -174,7 +215,7 @@ export default function MedicineScreen({ householdId }: Props) {
                 <button
                   type="button"
                   className="icon-button"
-                  aria-label={`Ta bort ${medicineName(log.medicine)} ${dateTime(log.given_at)}`}
+                  aria-label={`Ta bort ${medicineName(log.medicine_id)} ${dateTime(log.given_at)}`}
                   onClick={() => removeLog(log)}
                 >
                   <Trash2 size={18} aria-hidden />

@@ -12,7 +12,20 @@
 }
 
 .medicine-status.wait {
+  color: var(--muted);
+}
+
+.medicine-status.should {
+  color: var(--tone-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+.medicine-status.now {
   color: var(--red);
+  font-size: 34px;
+  letter-spacing: 0.02em;
 }
 
 .medicine-progress {
@@ -23,12 +36,54 @@
   background: var(--tone-soft);
 }
 
-.medicine-progress span {
+.medicine-progress {
+  position: relative;
+}
+
+.medicine-progress-fill {
   display: block;
   height: 100%;
   border-radius: var(--radius-pill);
   background: var(--tone-strong);
   transition: width 1s linear;
+}
+
+/* Markers at the minimum (1×) and "should give" (1.5×) times */
+.medicine-progress-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--surface);
+}
+
+.medicine-scale {
+  position: relative;
+  height: 16px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.medicine-scale span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.medicine-scale span:first-child {
+  transform: none;
+}
+
+.medicine-scale span:last-child {
+  transform: translateX(-100%);
+}
+
+.time-preview {
+  margin-top: var(--space-2);
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .medicine-next {
@@ -52,7 +107,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .medicine-give {
+  .medicine-give,
+  .time-form .medicine-confirm {
     background: var(--section);
     color: var(--bg);
   }
@@ -61,11 +117,6 @@
 .medicine-last .text-button {
   min-height: 0;
   font-size: 14px;
-}
-
-.other-time {
-  display: block;
-  margin: var(--space-2) auto 0;
 }
 
 .time-form {
@@ -93,8 +144,16 @@
   font-weight: 600;
 }
 
-.time-form .secondary-button {
+.time-form .medicine-confirm {
+  flex: 1;
   height: 48px;
+  background: color-mix(in srgb, var(--section), #000000 14%);
+  color: var(--tone-ink);
+}
+
+.time-form > .text-button {
+  display: block;
+  margin: var(--space-2) auto 0;
 }
 
 .medicine-give:disabled {
@@ -147,4 +206,140 @@
 .history-by {
   color: var(--muted);
   font-weight: 400;
+}
+
+/* Add a medicine */
+.add-medicine-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 56px;
+  margin-top: 14px;
+  border: 2px dashed var(--line);
+  border-radius: 28px;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.add-medicine {
+  margin-top: 14px;
+}
+
+.add-medicine h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.color-field {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.color-field legend {
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.color-swatch,
+.color-custom {
+  width: 40px;
+  height: 40px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+}
+
+.color-swatch[aria-pressed="true"] {
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 3px var(--surface);
+}
+
+.color-custom {
+  display: flex;
+  overflow: hidden;
+  border-color: var(--line);
+  cursor: pointer;
+}
+
+.color-custom input {
+  width: 150%;
+  height: 150%;
+  margin: -25%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.manage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.manage-list {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.manage-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 4px 0 var(--space-3);
+}
+
+.manage-row + .manage-row {
+  border-top: 1px solid var(--line-soft);
+}
+
+.manage-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.manage-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.manage-interval {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.add-medicine-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.add-medicine-form h3 {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.add-medicine-form label,
+.color-field legend {
+  font-weight: 600;
+}
+
+.add-medicine-form input:not([type="color"]) {
+  height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
 }
