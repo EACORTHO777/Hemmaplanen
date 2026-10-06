@@ -1,9 +1,12 @@
-import { useEffect , useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
+import CreateHousehold from './features/household/CreateHousehold' // NEW
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
+  const [householdId, setHouseholdId] = useState<string | null | undefined>(undefined) // NEW
+  const userId = session?.user.id // NEW
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -11,22 +14,38 @@ export default function App() {
     })
     return () => data.subscription.unsubscribe()
   }, [])
-  
+
+  // NEW: look up the user's household after login
+  useEffect(() => {
+    if (!userId) return
+    supabase
+      .from('members')
+      .select('household_id')
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => setHouseholdId(data?.household_id ?? null))
+  }, [userId])
+
   function handleLogin() {
-    supabase.auth.signInWithOAuth({ provider: 'google'})
+    supabase.auth.signInWithOAuth({ provider: 'google' })
   }
 
   function handleLogout() {
     supabase.auth.signOut()
+    setHouseholdId(undefined) // NEW
   }
 
   if (!session) {
     return <button onClick={handleLogin}>Log in with Google</button>
   }
 
+  if (householdId === undefined) return <p>Loading…</p> // NEW
+  if (householdId === null) return <CreateHousehold onCreated={setHouseholdId} /> // NEW
+
   return (
     <div>
       <p>Logged in as {session.user.email}</p>
+      <p>Household: {householdId}</p>
       <button onClick={handleLogout}>Log out</button>
     </div>
   )
