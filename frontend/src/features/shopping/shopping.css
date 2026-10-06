@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
-  margin-top: var(--space-5);
+  margin-top: 0;
   text-align: center;
 }
 

@@ -175,7 +175,10 @@ export default function MedicineScreen({ householdId }: Props) {
       )}
 
       {person &&
-        medicines.map((medicine) => {
+        medicines
+          // Shared medicines plus the ones that belong to the selected person
+          .filter((medicine) => medicine.member_id === null || medicine.member_id === activeId)
+          .map((medicine) => {
           const last = personLogs.find((log) => log.medicine_id === medicine.id);
           return (
             <MedicineCard
@@ -196,6 +199,8 @@ export default function MedicineScreen({ householdId }: Props) {
       <ManageMedicines
         householdId={householdId}
         medicines={medicines}
+        people={people}
+        selectedPersonId={activeId}
         onRemove={removeMedicine}
       />
 

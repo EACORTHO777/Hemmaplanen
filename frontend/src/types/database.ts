@@ -94,13 +94,13 @@ isOneToOne: false
                   ]
                 },"medicines": {
                   Row: {
-                    "color": string,"created_at": string,"household_id": string,"id": string,"min_interval_minutes": number,"name": string
+                    "color": string,"created_at": string,"household_id": string,"id": string,"member_id": string | null,"min_interval_minutes": number,"name": string
                   }
                   Insert: {
-                    "color": string,"created_at"?: string,"household_id": string,"id"?: string,"min_interval_minutes": number,"name": string
+                    "color": string,"created_at"?: string,"household_id": string,"id"?: string,"member_id"?: string | null,"min_interval_minutes": number,"name": string
                   }
                   Update: {
-                    "color"?: string,"created_at"?: string,"household_id"?: string,"id"?: string,"min_interval_minutes"?: number,"name"?: string
+                    "color"?: string,"created_at"?: string,"household_id"?: string,"id"?: string,"member_id"?: string | null,"min_interval_minutes"?: number,"name"?: string
                   }
                   Relationships: [
                     {
@@ -109,6 +109,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "households"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "medicines_member_fkey"
+      columns: ["household_id","member_id"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
     }
                   ]
                 },"members": {
