@@ -57,7 +57,6 @@ export default function App() {
 
   return (
     <div>
-      <p>Logged in as {session.user.email}</p>
       <HouseholdInfo householdId={householdId} />
       <ShoppingList householdId={householdId} />
       <button onClick={handleLogout}>Log out</button>
