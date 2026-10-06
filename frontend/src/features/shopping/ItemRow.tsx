@@ -9,18 +9,17 @@ type Props = {
 
 export default function ItemRow({ item, onToggle }: Props) {
   return (
-    <li key={item.id}>
+    <li className={item.done ? "item-row done" : "item-row"}>
       <label>
         <input
           type="checkbox"
           checked={item.done}
           onChange={() => onToggle(item)}
         />
-        {item.name}
+        <span className="item-name">{item.name}</span>
         {item.amount && (
-          <span>
-            {" "}
-            · {item.amount} {item.unit}
+          <span className="item-amount">
+            {item.amount} {item.unit}
           </span>
         )}
       </label>
