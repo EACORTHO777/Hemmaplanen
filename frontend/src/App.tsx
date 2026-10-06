@@ -5,6 +5,7 @@ import CreateHousehold from "./features/household/CreateHousehold"; // NEW
 import JoinHousehold from "./features/household/JoinHousehold";
 import HouseholdInfo from "./features/household/HouseholdInfo";
 import ShoppingList from "./features/shopping/ShoppingList";
+import TabBar, { type Tab } from "./components/TabBar";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -12,6 +13,7 @@ export default function App() {
     undefined,
   ); // NEW
   const userId = session?.user.id; // NEW
+  const [tab, setTab] = useState<Tab>("shopping");
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -58,8 +60,15 @@ export default function App() {
   return (
     <div>
       <HouseholdInfo householdId={householdId} />
-      <ShoppingList householdId={householdId} />
-      <button onClick={handleLogout}>Log out</button>
+      {tab === "shopping" ? (
+        <ShoppingList householdId={householdId} />
+      ) : (
+        <p className="coming-soon">Coming soon</p>
+      )}
+      <button className="logout" onClick={handleLogout}>
+        Log out
+      </button>
+      <TabBar active={tab} onChange={setTab} />
     </div>
   );
 }
