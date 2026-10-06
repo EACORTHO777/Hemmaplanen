@@ -35,6 +35,12 @@ export type Database = {
                   }
                   Relationships: [
                     {
+      foreignKeyName: "events_assigned_to_fkey"
+      columns: ["household_id","assigned_to"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
+    },{
       foreignKeyName: "events_household_id_fkey"
       columns: ["household_id"]
 isOneToOne: false
@@ -76,13 +82,13 @@ isOneToOne: false
                   ]
                 },"members": {
                   Row: {
-                    "created_at": string,"household_id": string,"user_id": string
+                    "created_at": string,"display_name": string,"household_id": string,"id": string,"user_id": string | null
                   }
                   Insert: {
-                    "created_at"?: string,"household_id": string,"user_id": string
+                    "created_at"?: string,"display_name": string,"household_id": string,"id"?: string,"user_id"?: string | null
                   }
                   Update: {
-                    "created_at"?: string,"household_id"?: string,"user_id"?: string
+                    "created_at"?: string,"display_name"?: string,"household_id"?: string,"id"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -124,6 +130,12 @@ isOneToOne: false
                   }
                   Relationships: [
                     {
+      foreignKeyName: "todos_assigned_to_fkey"
+      columns: ["household_id","assigned_to"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
+    },{
       foreignKeyName: "todos_household_id_fkey"
       columns: ["household_id"]
 isOneToOne: false
@@ -139,6 +151,9 @@ isOneToOne: false
           Functions: {
             "create_household":
 { Args: { "household_name": string }; Returns: string
+                           },
+"current_display_name":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "is_household_member":
 { Args: { "hid": string }; Returns: boolean
