@@ -4,6 +4,7 @@ import { supabase } from "./lib/supabase";
 import CreateHousehold from "./features/household/CreateHousehold"; // NEW
 import JoinHousehold from "./features/household/JoinHousehold";
 import HouseholdInfo from "./features/household/HouseholdInfo";
+import ShoppingList from "./features/shopping/ShoppingList";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -58,6 +59,7 @@ export default function App() {
     <div>
       <p>Logged in as {session.user.email}</p>
       <HouseholdInfo householdId={householdId} />
+      <ShoppingList householdId={householdId} />
       <button onClick={handleLogout}>Log out</button>
     </div>
   );
