@@ -35,6 +35,19 @@ export default function ShoppingList({ householdId }: Props) {
     );
   }
 
+  async function clearDone() {
+    const { error } = await supabase
+      .from("shopping_items")
+      .delete()
+      .eq("household_id", householdId)
+      .eq("done", true);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    setItems(items.filter((i) => !i.done));
+  }
+
   return (
     <div>
       <AddItemForm
@@ -55,6 +68,7 @@ export default function ShoppingList({ householdId }: Props) {
           </li>
         ))}
       </ul>
+      <button onClick={clearDone}>Clear checked</button>
     </div>
   );
 }
