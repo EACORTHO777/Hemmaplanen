@@ -21,6 +21,20 @@ export default function ShoppingList({ householdId }: Props) {
       .then(({ data }) => setItems(data ?? []));
   }, [householdId]);
 
+  async function toggleItem(item: Item) {
+    const { error } = await supabase
+      .from("shopping_items")
+      .update({ done: !item.done })
+      .eq("id", item.id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    setItems(
+      items.map((i) => (i.id === item.id ? { ...i, done: !i.done } : i)),
+    );
+  }
+
   return (
     <div>
       <AddItemForm
@@ -29,7 +43,16 @@ export default function ShoppingList({ householdId }: Props) {
       />
       <ul>
         {items.map((item) => (
-          <li key={item.id}>{item.name}</li>
+          <li key={item.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={item.done}
+                onChange={() => toggleItem(item)}
+              />
+              {item.name}
+            </label>
+          </li>
         ))}
       </ul>
     </div>
