@@ -13,12 +13,28 @@ export default function ShoppingList({ householdId }: Props) {
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
-    supabase
-      .from("shopping_items")
-      .select("*")
-      .eq("household_id", householdId)
-      .order("created_at")
-      .then(({ data }) => setItems(data ?? []));
+    function fetchItems() {
+      supabase
+        .from("shopping_items")
+        .select("*")
+        .eq("household_id", householdId)
+        .order("created_at")
+        .then(({ data }) => setItems(data ?? []));
+    }
+
+    fetchItems();
+    const channel = supabase
+      .channel(`shopping_items:${householdId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "shopping_items" },
+        () => fetchItems(),
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [householdId]);
 
   async function toggleItem(item: Item) {
