@@ -1,11 +1,13 @@
-import type { Database } from "../../types/database";
-
-type Item = Database["public"]["Tables"]["shopping_items"]["Row"];
+import type { Item } from "./types";
 
 type Props = {
   item: Item;
   onToggle: (item: Item) => void;
 };
+
+function formatAmount(amount: number) {
+  return String(amount).replace(".", ",");
+}
 
 export default function ItemRow({ item, onToggle }: Props) {
   return (
@@ -13,13 +15,14 @@ export default function ItemRow({ item, onToggle }: Props) {
       <label>
         <input
           type="checkbox"
+          className="item-check"
           checked={item.done}
           onChange={() => onToggle(item)}
         />
         <span className="item-name">{item.name}</span>
-        {item.amount && (
-          <span className="item-amount">
-            {item.amount} {item.unit}
+        {item.amount !== null && (
+          <span className="item-qty">
+            {formatAmount(item.amount)} {item.unit}
           </span>
         )}
       </label>

@@ -8,6 +8,7 @@ type Props = {
 export default function HouseholdInfo({ householdId }: Props) {
   const [name, setName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     supabase
@@ -22,11 +23,25 @@ export default function HouseholdInfo({ householdId }: Props) {
       });
   }, [householdId]);
 
+  async function copyCode() {
+    await navigator.clipboard.writeText(inviteCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <header className="app-header">
-      <p className="eyebrow">Hemmaplanen</p>
-      <h1>{name}</h1>
-      <p className="invite">Invite code: {inviteCode}</p>
+      <p className="eyebrow">{name}</p>
+      {inviteCode && (
+        <button
+          type="button"
+          className="invite-chip"
+          onClick={copyCode}
+          aria-label={`Inbjudningskod ${inviteCode}. Tryck för att kopiera.`}
+        >
+          {copied ? "Kopierad!" : `Kod ${inviteCode}`}
+        </button>
+      )}
     </header>
   );
 }
