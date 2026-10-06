@@ -17,6 +17,7 @@
   --highlight: #ebdbd3;
   --highlight-ink: #6a4536;
   --ring-track: #e6e3ea;
+  --red: #c2412d;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -52,6 +53,7 @@
     --highlight: #262c1a;
     --highlight-ink: #c8f05a;
     --ring-track: #24272b;
+    --red: #ff8a7a;
   }
 }
 

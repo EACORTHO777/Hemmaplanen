@@ -1,0 +1,204 @@
+/* Big week number + name day banner */
+.calendar-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.week-number {
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.week-label {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.today-label {
+  color: var(--muted);
+  font-size: 15px;
+  text-align: right;
+}
+
+.nameday-banner {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--highlight);
+  color: var(--highlight-ink);
+}
+
+.nameday-today {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.nameday-tomorrow {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+/* Month grid */
+.month {
+  margin-top: var(--space-5);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+}
+
+.month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.month-grid {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.month-grid th {
+  padding: var(--space-2) 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.month-grid td {
+  padding: 2px;
+}
+
+.week-col {
+  width: 34px;
+  font-variant-numeric: tabular-nums;
+}
+
+.month-grid tbody .week-col {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 40px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.day.outside {
+  opacity: 0.35;
+}
+
+.day.red {
+  color: var(--red);
+}
+
+.day.today {
+  border-color: var(--text);
+}
+
+.day[aria-pressed="true"] {
+  background: var(--highlight);
+  color: var(--highlight-ink);
+}
+
+.day-dots {
+  display: flex;
+  gap: 3px;
+  height: 6px;
+  margin-top: 2px;
+}
+
+.day-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tone-strong);
+}
+
+/* Selected day */
+.day-panel-head {
+  padding: 0 6px 10px;
+  color: var(--tone-ink);
+}
+
+.day-panel-head h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.day-details {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.day-empty {
+  padding: var(--space-3) 6px var(--space-2);
+  color: var(--muted);
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 4px 0 14px;
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.event-time {
+  flex-shrink: 0;
+  width: 52px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-chip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 36px;
+  padding: 0 10px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.time-chip input {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+}
