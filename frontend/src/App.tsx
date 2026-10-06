@@ -7,6 +7,7 @@ import HouseholdInfo from "./features/household/HouseholdInfo";
 import ShoppingList from "./features/shopping/ShoppingList";
 import TabBar, { type Tab } from "./components/TabBar";
 import TodoList from "./features/todos/TodoList";
+import HouseholdScreen from "./features/household/HouseholdScreen";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -15,6 +16,7 @@ export default function App() {
     undefined,
   );
   const [tab, setTab] = useState<Tab>("shopping");
+  const [showHousehold, setShowHousehold] = useState(false);
   const userId = session?.user.id;
 
   useEffect(() => {
@@ -50,12 +52,29 @@ export default function App() {
 
   return (
     <div className="app">
-      <HouseholdInfo householdId={householdId} />
+      <HouseholdInfo
+        householdId={householdId}
+        onOpenHousehold={() => setShowHousehold(true)}
+      />
       <main>
-        {tab === "shopping" && <ShoppingList householdId={householdId} />}
-        {tab === "todos" && <TodoList householdId={householdId} />}
-        {(tab === "calendar" || tab === "medicine") && (
-          <p className="coming-soon">Kommer snart</p>
+        {showHousehold ? (
+          <HouseholdScreen
+            householdId={householdId}
+            userId={session.user.id}
+            onBack={() => setShowHousehold(false)}
+            onLeft={() => {
+              setShowHousehold(false);
+              setHouseholdId(null);
+            }}
+          />
+        ) : (
+          <>
+            {tab === "shopping" && <ShoppingList householdId={householdId} />}
+            {tab === "todos" && <TodoList householdId={householdId} />}
+            {(tab === "calendar" || tab === "medicine") && (
+              <p className="coming-soon">Kommer snart</p>
+            )}
+          </>
         )}
       </main>
       <button
