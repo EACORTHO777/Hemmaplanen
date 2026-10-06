@@ -4,6 +4,7 @@ import type { Database } from "../../types/database";
 import AddItemForm from "./AddItemForm";
 import ItemRow from "./ItemRow";
 import { SECTIONS } from "./options";
+import "./shopping.css";
 
 type Item = Database["public"]["Tables"]["shopping_items"]["Row"];
 
@@ -83,7 +84,7 @@ export default function ShoppingList({ householdId }: Props) {
         );
         if (list.length === 0) return null;
         return (
-          <section key={section.title}>
+          <section key={section.title} className="section-card">
             <h3>{section.title}</h3>
             <ul>
               {list.map((item) => (
@@ -95,7 +96,7 @@ export default function ShoppingList({ householdId }: Props) {
       })}
 
       {other.length > 0 && (
-        <section>
+        <section className="section-card">
           <h3>Övrigt</h3>
           <ul>
             {other.map((item) => (
@@ -106,7 +107,7 @@ export default function ShoppingList({ householdId }: Props) {
       )}
 
       {done.length > 0 && (
-        <section>
+        <section className="section-card">
           <h3>Klar</h3>
           <ul>
             {done.map((item) => (

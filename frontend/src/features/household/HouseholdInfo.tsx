@@ -23,9 +23,10 @@ export default function HouseholdInfo({ householdId }: Props) {
   }, [householdId]);
 
   return (
-    <div>
+    <header className="app-header">
+      <p className="eyebrow">Hemmaplanen</p>
       <h1>{name}</h1>
-      <p>Invite code: {inviteCode}</p>
-    </div>
+      <p className="invite">Invite code: {inviteCode}</p>
+    </header>
   );
 }

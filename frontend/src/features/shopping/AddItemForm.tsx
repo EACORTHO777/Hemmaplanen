@@ -40,8 +40,9 @@ export default function AddItemForm({ householdId, onAdded }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="section-card add-form">
       <input
+        className="add-name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Add item"
