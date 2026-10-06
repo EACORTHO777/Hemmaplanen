@@ -11,6 +11,7 @@ type Props = {
   people: Person[];
   selectedPersonId: string | null;
   onRemove: (medicine: Medicine) => void;
+  onChanged: () => void;
 };
 
 // Adding, editing and removing medicines lives here, away from the "Ge" buttons,
@@ -21,6 +22,7 @@ export default function ManageMedicines({
   people,
   selectedPersonId,
   onRemove,
+  onChanged,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -66,7 +68,7 @@ export default function ManageMedicines({
       alert(error.message);
       return;
     }
-    // Realtime updates the cards
+    onChanged();
     resetForm();
   }
 

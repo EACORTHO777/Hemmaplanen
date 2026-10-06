@@ -30,6 +30,8 @@ export default function MedicineScreen({ householdId }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [medicines, setMedicines] = useState<Medicine[]>([]);
+  // Bumped after adding/editing a medicine so the list reloads right away
+  const [medicinesVersion, setMedicinesVersion] = useState(0);
   const [personId, setPersonId] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -71,7 +73,7 @@ export default function MedicineScreen({ householdId }: Props) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [householdId]);
+  }, [householdId, medicinesVersion]);
 
   useEffect(() => {
     function fetchLogs() {
@@ -139,7 +141,13 @@ export default function MedicineScreen({ householdId }: Props) {
     const question = `Ta bort ${medicine.name}? All historik för ${medicine.name} försvinner också.`;
     if (!confirm(question)) return;
     const { error } = await supabase.from("medicines").delete().eq("id", medicine.id);
-    if (error) alert(error.message);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    // Don't wait for realtime: remove the card and its history right away
+    setMedicines((prev) => prev.filter((m) => m.id !== medicine.id));
+    setLogs((prev) => prev.filter((log) => log.medicine_id !== medicine.id));
   }
 
   async function removeLog(log: Log) {
@@ -201,6 +209,7 @@ export default function MedicineScreen({ householdId }: Props) {
         medicines={medicines}
         people={people}
         selectedPersonId={activeId}
+        onChanged={() => setMedicinesVersion((v) => v + 1)}
         onRemove={removeMedicine}
       />
 
