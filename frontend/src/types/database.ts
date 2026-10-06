@@ -63,16 +63,22 @@ isOneToOne: false
                   ]
                 },"medicine_logs": {
                   Row: {
-                    "given_at": string,"given_by": string | null,"household_id": string,"id": string,"medicine": string
+                    "given_at": string,"given_by": string | null,"given_to": string,"household_id": string,"id": string,"medicine": string
                   }
                   Insert: {
-                    "given_at"?: string,"given_by"?: string | null,"household_id": string,"id"?: string,"medicine": string
+                    "given_at"?: string,"given_by"?: string | null,"given_to": string,"household_id": string,"id"?: string,"medicine": string
                   }
                   Update: {
-                    "given_at"?: string,"given_by"?: string | null,"household_id"?: string,"id"?: string,"medicine"?: string
+                    "given_at"?: string,"given_by"?: string | null,"given_to"?: string,"household_id"?: string,"id"?: string,"medicine"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "medicine_logs_given_to_fkey"
+      columns: ["household_id","given_to"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
+    },{
       foreignKeyName: "medicine_logs_household_id_fkey"
       columns: ["household_id"]
 isOneToOne: false

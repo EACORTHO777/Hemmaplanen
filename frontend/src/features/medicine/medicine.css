@@ -1,0 +1,150 @@
+.medicine-body {
+  padding: var(--space-4);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.medicine-status {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tone-ink);
+}
+
+.medicine-status.wait {
+  color: var(--red);
+}
+
+.medicine-progress {
+  height: 10px;
+  margin-top: var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--tone-soft);
+}
+
+.medicine-progress span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--tone-strong);
+  transition: width 1s linear;
+}
+
+.medicine-next {
+  margin-top: var(--space-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.medicine-last {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* The medicine's own color, a shade darker than the card */
+.medicine-give {
+  width: 100%;
+  margin-top: var(--space-4);
+  background: color-mix(in srgb, var(--section), #000000 14%);
+  color: var(--tone-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  .medicine-give {
+    background: var(--section);
+    color: var(--bg);
+  }
+}
+
+.medicine-last .text-button {
+  min-height: 0;
+  font-size: 14px;
+}
+
+.other-time {
+  display: block;
+  margin: var(--space-2) auto 0;
+}
+
+.time-form {
+  margin-top: var(--space-4);
+}
+
+.time-form label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.time-form-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.time-form input {
+  height: 48px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-weight: 600;
+}
+
+.time-form .secondary-button {
+  height: 48px;
+}
+
+.medicine-give:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.medicine-history {
+  margin-top: var(--space-5);
+}
+
+.medicine-history h2 {
+  margin-bottom: var(--space-2);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.medicine-history ul {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 4px 0 var(--space-4);
+}
+
+.history-row + .history-row {
+  border-top: 1px solid var(--line-soft);
+}
+
+.history-when {
+  flex-shrink: 0;
+  width: 128px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-what {
+  flex: 1;
+  font-weight: 600;
+}
+
+.history-by {
+  color: var(--muted);
+  font-weight: 400;
+}
