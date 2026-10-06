@@ -80,6 +80,12 @@ export default function ShoppingList({ householdId }: Props) {
                 onChange={() => toggleItem(item)}
               />
               {item.name}
+              {item.amount && (
+                <span>
+                  {" "}
+                  · {item.amount} {item.unit}
+                </span>
+              )}
             </label>
           </li>
         ))}
