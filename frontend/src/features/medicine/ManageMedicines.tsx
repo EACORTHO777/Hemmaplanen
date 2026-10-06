@@ -1,21 +1,33 @@
 import { useState, type FormEvent } from "react";
 import { Pencil, Settings2, Trash2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import type { Person } from "../household/people";
+import { toneStyle } from "../shopping/options";
 import { formatInterval, MEDICINE_COLORS, type Medicine } from "./medicines";
 
 type Props = {
   householdId: string;
   medicines: Medicine[];
+  people: Person[];
+  selectedPersonId: string | null;
   onRemove: (medicine: Medicine) => void;
 };
 
 // Adding, editing and removing medicines lives here, away from the "Ge" buttons,
 // so a medicine can't be removed by mistake while giving a dose.
-export default function ManageMedicines({ householdId, medicines, onRemove }: Props) {
+export default function ManageMedicines({
+  householdId,
+  medicines,
+  people,
+  selectedPersonId,
+  onRemove,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [color, setColor] = useState(MEDICINE_COLORS[0]);
   const [hours, setHours] = useState("4");
+  // Who the medicine is for: a member's id, or null for everyone
+  const [memberId, setMemberId] = useState<string | null>(selectedPersonId);
   // null = adding a new medicine, otherwise the one being edited
   const [editing, setEditing] = useState<Medicine | null>(null);
 
@@ -24,6 +36,7 @@ export default function ManageMedicines({ householdId, medicines, onRemove }: Pr
     setName("");
     setColor(MEDICINE_COLORS[0]);
     setHours("4");
+    setMemberId(selectedPersonId);
   }
 
   function startEdit(medicine: Medicine) {
@@ -31,6 +44,11 @@ export default function ManageMedicines({ householdId, medicines, onRemove }: Pr
     setName(medicine.name);
     setColor(medicine.color);
     setHours(String(medicine.min_interval_minutes / 60).replace(".", ","));
+    setMemberId(medicine.member_id);
+  }
+
+  function ownerName(id: string | null) {
+    return id === null ? "alla" : (people.find((p) => p.id === id)?.name ?? "okänd");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -39,6 +57,7 @@ export default function ManageMedicines({ householdId, medicines, onRemove }: Pr
       name: name.trim(),
       color: color.toUpperCase(),
       min_interval_minutes: Math.round(Number(hours.replace(",", ".")) * 60),
+      member_id: memberId,
     };
     const { error } = editing
       ? await supabase.from("medicines").update(values).eq("id", editing.id)
@@ -53,7 +72,14 @@ export default function ManageMedicines({ householdId, medicines, onRemove }: Pr
 
   if (!open) {
     return (
-      <button type="button" className="add-medicine-toggle" onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className="add-medicine-toggle"
+        onClick={() => {
+          setMemberId(selectedPersonId);
+          setOpen(true);
+        }}
+      >
         <Settings2 size={20} aria-hidden />
         Hantera mediciner
       </button>
@@ -81,7 +107,9 @@ export default function ManageMedicines({ householdId, medicines, onRemove }: Pr
           <li key={medicine.id} className="manage-row">
             <span className="manage-dot" style={{ background: medicine.color }} aria-hidden="true" />
             <span className="manage-name">{medicine.name}</span>
-            <span className="manage-interval">var {formatInterval(medicine.min_interval_minutes)}</span>
+            <span className="manage-interval">
+              {ownerName(medicine.member_id)} · var {formatInterval(medicine.min_interval_minutes)}
+            </span>
             <button
               type="button"
               className="icon-button"
@@ -114,6 +142,32 @@ export default function ManageMedicines({ householdId, medicines, onRemove }: Pr
           maxLength={40}
           required
         />
+
+        <fieldset className="color-field">
+          <legend>För vem?</legend>
+          <div className="owner-chips">
+            <button
+              type="button"
+              className="chip chip-small chip-all"
+              aria-pressed={memberId === null}
+              onClick={() => setMemberId(null)}
+            >
+              Alla
+            </button>
+            {people.map((person) => (
+              <button
+                key={person.id}
+                type="button"
+                className="chip chip-small tone"
+                style={toneStyle(person.color)}
+                aria-pressed={memberId === person.id}
+                onClick={() => setMemberId(person.id)}
+              >
+                {person.name}
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         <fieldset className="color-field">
           <legend>Färg</legend>
