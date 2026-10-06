@@ -6,6 +6,7 @@ import Onboarding from "./features/household/Onboarding";
 import HouseholdInfo from "./features/household/HouseholdInfo";
 import ShoppingList from "./features/shopping/ShoppingList";
 import TabBar, { type Tab } from "./components/TabBar";
+import TodoList from "./features/todos/TodoList";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -51,9 +52,9 @@ export default function App() {
     <div className="app">
       <HouseholdInfo householdId={householdId} />
       <main>
-        {tab === "shopping" ? (
-          <ShoppingList householdId={householdId} />
-        ) : (
+        {tab === "shopping" && <ShoppingList householdId={householdId} />}
+        {tab === "todos" && <TodoList householdId={householdId} />}
+        {(tab === "calendar" || tab === "medicine") && (
           <p className="coming-soon">Kommer snart</p>
         )}
       </main>
