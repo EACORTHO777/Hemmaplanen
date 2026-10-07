@@ -4,7 +4,12 @@ A household app for shopping, calendar, to-dos and medicine, used every day by m
 
 **Live:** https://hemmaplanen.vercel.app (press **Prova demo** to try it with a made-up family, no login needed)
 
-<!-- Screenshots: add phone screenshots of each tab here -->
+| Shopping | Calendar | To-dos | Medicine |
+| --- | --- | --- | --- |
+| <img src="docs/screenshots/shopping-light.jpg" width="200" alt="Shopping list grouped by store section"> | <img src="docs/screenshots/calendar-light.jpg" width="200" alt="Calendar with week numbers and name days"> | <img src="docs/screenshots/todos-light.jpg" width="200" alt="To-dos grouped per person"> | <img src="docs/screenshots/medicine-light.jpg" width="200" alt="Medicine card with time until next dose"> |
+| <img src="docs/screenshots/shopping-dark.jpg" width="200" alt="Shopping list in dark mode"> | <img src="docs/screenshots/calendar-dark.jpg" width="200" alt="Calendar in dark mode"> | <img src="docs/screenshots/todos-dark.jpg" width="200" alt="To-dos in dark mode"> | <img src="docs/screenshots/medicine-dark.jpg" width="200" alt="Medicine in dark mode"> |
+
+<sub>Screenshots from the demo household, light and dark theme.</sub>
 
 ## Features
 
