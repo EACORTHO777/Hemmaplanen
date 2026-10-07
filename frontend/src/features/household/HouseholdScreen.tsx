@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
 import InviteCard from "./InviteCard";
+import ThemeToggle from "../../components/ThemeToggle";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -159,6 +160,9 @@ export default function HouseholdScreen({
           Lägg till
         </button>
       </form>
+
+      <h2 className="settings-heading">Inställningar</h2>
+      <ThemeToggle />
     </>
   );
 }

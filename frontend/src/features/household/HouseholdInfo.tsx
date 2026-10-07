@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-import ThemeToggle from "../../components/ThemeToggle";
 
 type Props = {
   householdId: string;
@@ -23,7 +22,6 @@ export default function HouseholdInfo({ householdId, onOpenHousehold }: Props) {
 
   return (
     <header className="app-header">
-      <ThemeToggle />
       <button
         type="button"
         className="household-avatar"

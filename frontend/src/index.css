@@ -259,9 +259,6 @@ button {
   top: 0;
   right: 0;
   z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
 }
 
 .household-avatar {
@@ -338,9 +335,62 @@ button {
   background: var(--line-soft);
 }
 
-.theme-toggle {
-  background: var(--surface);
-  border: 1px solid var(--line);
+.settings-heading {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.settings-card {
+  padding: var(--space-2) var(--space-3);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-2);
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.setting-label {
+  flex: 1;
+  font-weight: 600;
+}
+
+/* iOS-style switch, driven by aria-checked on the button */
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  transition: background 150ms ease;
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+  transition: transform 150ms ease;
+}
+
+[aria-checked="true"] .switch {
+  background: var(--accent);
+}
+
+[aria-checked="true"] .switch-knob {
+  transform: translateX(20px);
 }
 
 .back-button {
