@@ -61,6 +61,62 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"inhaler_puffs": {
+                  Row: {
+                    "given_at": string,"given_by": string | null,"household_id": string,"id": string,"inhaler_id": string
+                  }
+                  Insert: {
+                    "given_at"?: string,"given_by"?: string | null,"household_id": string,"id"?: string,"inhaler_id": string
+                  }
+                  Update: {
+                    "given_at"?: string,"given_by"?: string | null,"household_id"?: string,"id"?: string,"inhaler_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "inhaler_puffs_household_id_fkey"
+      columns: ["household_id"]
+isOneToOne: false
+      referencedRelation: "households"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "inhaler_puffs_household_id_inhaler_id_fkey"
+      columns: ["household_id","inhaler_id"]
+isOneToOne: false
+      referencedRelation: "inhaler_overview"
+      referencedColumns: ["household_id","id"]
+    },{
+      foreignKeyName: "inhaler_puffs_household_id_inhaler_id_fkey"
+      columns: ["household_id","inhaler_id"]
+isOneToOne: false
+      referencedRelation: "inhalers"
+      referencedColumns: ["household_id","id"]
+    }
+                  ]
+                },"inhalers": {
+                  Row: {
+                    "capacity": number,"color": string,"created_at": string,"household_id": string,"id": string,"member_id": string,"name": string,"remaining_at_start": number,"started_at": string,"warn_at": number
+                  }
+                  Insert: {
+                    "capacity"?: number,"color": string,"created_at"?: string,"household_id": string,"id"?: string,"member_id": string,"name": string,"remaining_at_start"?: number,"started_at"?: string,"warn_at"?: number
+                  }
+                  Update: {
+                    "capacity"?: number,"color"?: string,"created_at"?: string,"household_id"?: string,"id"?: string,"member_id"?: string,"name"?: string,"remaining_at_start"?: number,"started_at"?: string,"warn_at"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "inhalers_household_id_fkey"
+      columns: ["household_id"]
+isOneToOne: false
+      referencedRelation: "households"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "inhalers_household_id_member_id_fkey"
+      columns: ["household_id","member_id"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
+    }
+                  ]
                 },"item_memory": {
                   Row: {
                     "amount": number | null,"category": string | null,"household_id": string,"name_key": string,"unit": string | null,"updated_at": string
@@ -82,13 +138,13 @@ isOneToOne: false
                   ]
                 },"medicine_logs": {
                   Row: {
-                    "given_at": string,"given_by": string | null,"given_to": string,"household_id": string,"id": string,"medicine_id": string
+                    "given_at": string,"given_by": string | null,"given_to": string,"household_id": string,"id": string,"medicine_id": string,"reminder_level": number
                   }
                   Insert: {
-                    "given_at"?: string,"given_by"?: string | null,"given_to": string,"household_id": string,"id"?: string,"medicine_id": string
+                    "given_at"?: string,"given_by"?: string | null,"given_to": string,"household_id": string,"id"?: string,"medicine_id": string,"reminder_level"?: number
                   }
                   Update: {
-                    "given_at"?: string,"given_by"?: string | null,"given_to"?: string,"household_id"?: string,"id"?: string,"medicine_id"?: string
+                    "given_at"?: string,"given_by"?: string | null,"given_to"?: string,"household_id"?: string,"id"?: string,"medicine_id"?: string,"reminder_level"?: number
                   }
                   Relationships: [
                     {
@@ -221,10 +277,34 @@ isOneToOne: false
                 }
           }
           Views: {
-            [_ in never]: never
+            "inhaler_overview": {
+                  Row: {
+                    "capacity": number | null,"color": string | null,"household_id": string | null,"id": string | null,"last_puff_at": string | null,"member_id": string | null,"name": string | null,"remaining": number | null,"started_at": string | null,"today": number | null,"warn_at": number | null,"yesterday": number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "inhalers_household_id_fkey"
+      columns: ["household_id"]
+isOneToOne: false
+      referencedRelation: "households"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "inhalers_household_id_member_id_fkey"
+      columns: ["household_id","member_id"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["household_id","id"]
+    }
+                  ]
+                }
           }
           Functions: {
-            "create_household":
+            "claim_medicine_reminders":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "given_at": string,"household_id": string,"level": number,"medicine": string,"person": string
+            }[]
+                           },
+"create_household":
 { Args: { "household_name": string }; Returns: string
                            },
 "current_display_name":
