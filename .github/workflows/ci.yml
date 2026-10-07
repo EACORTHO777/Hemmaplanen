@@ -84,3 +84,53 @@ jobs:
 
       - name: RLS and medicine rule tests (pgTAP)
         run: supabase test db
+
+  e2e:
+    name: E2E
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: ci-placeholder
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: ci-placeholder
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Only the parts the app needs: database, auth, API and realtime
+      - name: Start Supabase
+        run: supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector
+
+      - name: Point the app at the local Supabase
+        run: |
+          supabase status -o env \
+            | grep -E '^(API_URL|PUBLISHABLE_KEY)=' \
+            | sed -e 's/^API_URL=/VITE_SUPABASE_URL=/' -e 's/^PUBLISHABLE_KEY=/VITE_SUPABASE_PUBLISHABLE_KEY=/' \
+            | tr -d '"' > frontend/.env.local
+
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install browser
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests (Playwright)
+        working-directory: frontend
+        run: npm run e2e
+
+      - name: Keep the trace of failed tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: frontend/test-results
+          retention-days: 7

@@ -82,8 +82,9 @@ Medicine logs are health data, a special category under GDPR Article 9. How it i
 | Frontend | Vitest + React Testing Library | 18 |
 | Backend | Vitest + Supertest | 18 |
 | Database | pgTAP (RLS isolation, triggers, demo) | 62 |
+| End-to-end | Playwright on a phone-sized Chromium (demo → add item → check off) | 1 |
 
-All three run in CI on every pull request and are required to merge to `main`.
+All of them run in CI on every pull request; the end-to-end test runs against a local Supabase started inside the CI job.
 
 ## Accessibility and Lighthouse
 
@@ -122,6 +123,7 @@ Run the tests:
 npm --prefix frontend test
 npm --prefix backend test
 supabase test db
+npm --prefix frontend run e2e   # needs `supabase start`
 ```
 
 ## Project structure
