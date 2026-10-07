@@ -2,7 +2,7 @@ import type { Unit } from "./options";
 
 export type ParsedItem = {
   name: string;
-  amount: number | null;
+  amount: number;
   unit: Unit;
 };
 
@@ -16,7 +16,7 @@ export function parseQuickAdd(text: string): ParsedItem {
   const trailing = trimmed.match(TRAILING);
 
   let name = trimmed;
-  let amount: number | null = null;
+  let amount = 1;
   let unit: Unit = "st";
 
   if (leading) {
