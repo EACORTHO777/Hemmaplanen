@@ -83,7 +83,16 @@ Medicine logs are health data, a special category under GDPR Article 9. How it i
 
 All three run in CI on every pull request and are required to merge to `main`.
 
-<!-- Lighthouse scores: add after the accessibility pass (#9) -->
+## Accessibility and Lighthouse
+
+Lighthouse on the live site (October 2026):
+
+| | Performance | Accessibility | Best practices | SEO |
+| --- | --- | --- | --- | --- |
+| Mobile | 98 | 100 | 100 | 100 |
+| Desktop | 100 | 100 | 100 | 100 |
+
+Lighthouse only reaches the login page, so every tab inside the demo was also scanned with [axe-core](https://github.com/dequelabs/axe-core) (WCAG 2 A/AA) in both light and dark theme: 0 violations. The whole app works with keyboard only and was tested with VoiceOver on iPhone.
 
 ## Run locally
 
