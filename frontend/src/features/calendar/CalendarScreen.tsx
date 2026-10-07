@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { useLiveReload } from "../../lib/useLiveReload";
 import { fetchSwedishMonth, type SwedishDay } from "../../lib/swedishDays";
 import type { Database } from "../../types/database";
 import { EVERYONE, toPeople } from "../household/people";
@@ -34,31 +35,17 @@ export default function CalendarScreen({ householdId }: Props) {
   const [swedishDays, setSwedishDays] = useState<Map<string, SwedishDay>>(new Map());
 
   // Your events, live
-  useEffect(() => {
-    function fetchEvents() {
-      supabase
-        .from("events")
-        .select("*")
-        .eq("household_id", householdId)
-        .order("date")
-        .order("time")
-        .then(({ data }) => setEvents(data ?? []));
-    }
-
-    fetchEvents();
-    const channel = supabase
-      .channel(`events:${householdId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "events" },
-        () => fetchEvents(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const fetchEvents = useCallback(() => {
+    supabase
+      .from("events")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("date")
+      .order("time")
+      .then(({ data }) => setEvents(data ?? []));
   }, [householdId]);
+
+  useLiveReload("events", householdId, fetchEvents);
 
   useEffect(() => {
     supabase
@@ -143,9 +130,10 @@ export default function CalendarScreen({ householdId }: Props) {
         events={events.filter((e) => e.date === selected)}
         people={people}
         info={swedishDays.get(selected)}
+        onChanged={fetchEvents}
       />
 
-      <AddEvent householdId={householdId} date={selected} people={people} />
+      <AddEvent householdId={householdId} date={selected} people={people} onAdded={fetchEvents} />
     </>
   );
 }

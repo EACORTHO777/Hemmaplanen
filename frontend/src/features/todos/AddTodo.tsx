@@ -7,9 +7,10 @@ import { toneStyle } from "../shopping/options";
 type Props = {
   householdId: string;
   people: Person[];
+  onAdded: () => void;
 };
 
-export default function AddTodo({ householdId, people }: Props) {
+export default function AddTodo({ householdId, people, onAdded }: Props) {
   const [title, setTitle] = useState("");
   // null = shared by everyone
   const [assignedTo, setAssignedTo] = useState<string | null>(null);
@@ -26,6 +27,7 @@ export default function AddTodo({ householdId, people }: Props) {
       alert(error.message);
       return;
     }
+    onAdded();
     setTitle("");
   }
 

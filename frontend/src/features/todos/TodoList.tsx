@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { useLiveReload } from "../../lib/useLiveReload";
 import { toneStyle } from "../shopping/options";
 import type { Database } from "../../types/database";
 import AddTodo from "./AddTodo";
@@ -26,30 +27,16 @@ export default function TodoList({ householdId }: Props) {
       .then(({ data }) => setMembers(data ?? []));
   }, [householdId]);
 
-  useEffect(() => {
-    function fetchTodos() {
-      supabase
-        .from("todos")
-        .select("*")
-        .eq("household_id", householdId)
-        .order("created_at")
-        .then(({ data }) => setTodos(data ?? []));
-    }
-
-    fetchTodos();
-    const channel = supabase
-      .channel(`todos:${householdId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "todos" },
-        () => fetchTodos(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const fetchTodos = useCallback(() => {
+    supabase
+      .from("todos")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("created_at")
+      .then(({ data }) => setTodos(data ?? []));
   }, [householdId]);
+
+  useLiveReload("todos", householdId, fetchTodos);
 
   async function toggleTodo(todo: Todo) {
     const { error } = await supabase
@@ -179,7 +166,7 @@ export default function TodoList({ householdId }: Props) {
           </ul>
         </section>
       ))}
-      <AddTodo householdId={householdId} people={people} />
+      <AddTodo householdId={householdId} people={people} onAdded={fetchTodos} />
     </>
   );
 }

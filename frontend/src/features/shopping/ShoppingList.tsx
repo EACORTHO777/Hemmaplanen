@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { useLiveReload } from "../../lib/useLiveReload";
 import ItemRow from "./ItemRow";
 import ProgressRing from "./ProgressRing";
 import QuickAdd from "./QuickAdd";
@@ -15,30 +16,16 @@ export default function ShoppingList({ householdId }: Props) {
   const [items, setItems] = useState<Item[]>([]);
   const [filter, setFilter] = useState<string | null>(null);
 
-  useEffect(() => {
-    function fetchItems() {
-      supabase
-        .from("shopping_items")
-        .select("*")
-        .eq("household_id", householdId)
-        .order("created_at")
-        .then(({ data }) => setItems(data ?? []));
-    }
-
-    fetchItems();
-    const channel = supabase
-      .channel(`shopping_items:${householdId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "shopping_items" },
-        () => fetchItems(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const fetchItems = useCallback(() => {
+    supabase
+      .from("shopping_items")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("created_at")
+      .then(({ data }) => setItems(data ?? []));
   }, [householdId]);
+
+  useLiveReload("shopping_items", householdId, fetchItems);
 
   async function toggleItem(item: Item) {
     const { error } = await supabase

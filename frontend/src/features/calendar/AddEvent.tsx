@@ -9,6 +9,7 @@ type Props = {
   householdId: string;
   date: string;
   people: Person[];
+  onAdded: () => void;
 };
 
 function shortDate(iso: string) {
@@ -19,7 +20,7 @@ function shortDate(iso: string) {
   }).format(fromIsoDate(iso));
 }
 
-export default function AddEvent({ householdId, date, people }: Props) {
+export default function AddEvent({ householdId, date, people, onAdded }: Props) {
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("");
   // null = shared by everyone
@@ -41,7 +42,7 @@ export default function AddEvent({ householdId, date, people }: Props) {
       alert(error.message);
       return;
     }
-    // Realtime refreshes the calendar
+    onAdded();
     setTitle("");
     setTime("");
   }

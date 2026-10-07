@@ -13,14 +13,18 @@ type Props = {
   events: CalendarEvent[];
   people: Person[];
   info: SwedishDay | undefined;
+  onChanged: () => void;
 };
 
-export default function DayEvents({ date, events, people, info }: Props) {
+export default function DayEvents({ date, events, people, info, onChanged }: Props) {
   async function removeEvent(event: CalendarEvent) {
     if (!confirm(`Ta bort "${event.title}"?`)) return;
     const { error } = await supabase.from("events").delete().eq("id", event.id);
-    if (error) alert(error.message);
-    // Realtime refreshes the list in CalendarScreen
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    onChanged();
   }
 
   const details = [info?.holiday, info?.nameDays.length ? `Namnsdag: ${info.nameDays.join(", ")}` : null]

@@ -106,12 +106,10 @@
   color: var(--tone-ink);
 }
 
-@media (prefers-color-scheme: dark) {
-  .medicine-give,
-  .time-form .medicine-confirm {
-    background: var(--section);
-    color: var(--bg);
-  }
+[data-theme="dark"] .medicine-give,
+[data-theme="dark"] .time-form .medicine-confirm {
+  background: var(--section);
+  color: var(--bg);
 }
 
 .medicine-last .text-button {
