@@ -117,6 +117,19 @@ npm --prefix backend install
 npm --prefix backend run dev
 ```
 
+### Or with Docker
+
+Runs the production build of the app and the API behind [Caddy](https://caddyserver.com) on one address. (The live site uses Vercel and Render instead; this is for running the whole stack on one machine.)
+
+```bash
+supabase start
+cp .env.example .env              # fill in the publishable key from `supabase status`
+cp backend/.env.example backend/.env
+docker compose up --build         # http://localhost:8080
+```
+
+Caddy serves the React build and forwards `/api/*` to the Express container, so the browser talks to one origin and the API needs no CORS for it.
+
 Run the tests:
 
 ```bash

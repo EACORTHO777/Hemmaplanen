@@ -1,0 +1,28 @@
+# The whole app behind Caddy on http://localhost:8080
+# Supabase runs separately with `supabase start` (it is its own Docker stack).
+services:
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+        VITE_VAPID_PUBLIC_KEY: ${VITE_VAPID_PUBLIC_KEY:-}
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  api:
+    build: ./backend
+    env_file: backend/.env
+    environment:
+      # Inside a container, the Mac's localhost is host.docker.internal
+      SUPABASE_URL: http://host.docker.internal:54321
+      FRONTEND_ORIGIN: http://localhost:8080
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
