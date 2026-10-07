@@ -1,0 +1,33 @@
+name: Demo cleanup
+
+# Every night: delete demo households and anonymous demo users older than a day
+on:
+  schedule:
+    - cron: "15 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    name: Remove old demo data
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Clean up
+        run: npm run demo-cleanup
+        env:
+          SUPABASE_URL: https://ovccgihvauwvqtcqfgrk.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}

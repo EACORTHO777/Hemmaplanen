@@ -50,13 +50,13 @@ isOneToOne: false
                   ]
                 },"households": {
                   Row: {
-                    "created_at": string,"id": string,"invite_code": string,"name": string
+                    "created_at": string,"id": string,"invite_code": string,"is_demo": boolean,"name": string
                   }
                   Insert: {
-                    "created_at"?: string,"id"?: string,"invite_code"?: string,"name": string
+                    "created_at"?: string,"id"?: string,"invite_code"?: string,"is_demo"?: boolean,"name": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"invite_code"?: string,"name"?: string
+                    "created_at"?: string,"id"?: string,"invite_code"?: string,"is_demo"?: boolean,"name"?: string
                   }
                   Relationships: [
                     
@@ -304,11 +304,20 @@ isOneToOne: false
               "given_at": string,"household_id": string,"level": number,"medicine": string,"person": string
             }[]
                            },
+"cleanup_demo":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
+"create_demo_household":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "create_household":
 { Args: { "household_name": string }; Returns: string
                            },
 "current_display_name":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"is_anonymous_user":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "is_household_member":
 { Args: { "hid": string }; Returns: boolean

@@ -13,6 +13,7 @@ type Props = {
   userId: string;
   onBack: () => void;
   onLeft: () => void;
+  isDemo: boolean;
 };
 
 export default function HouseholdScreen({
@@ -20,6 +21,7 @@ export default function HouseholdScreen({
   userId,
   onBack,
   onLeft,
+  isDemo,
 }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
   const [name, setName] = useState("");
@@ -146,7 +148,8 @@ export default function HouseholdScreen({
         ))}
       </ul>
 
-      <InviteCard householdId={householdId} />
+      {/* Demo households can't be joined, so there is no code to share */}
+      {!isDemo && <InviteCard householdId={householdId} />}
 
       <form className="form-card" onSubmit={addMember}>
         <label htmlFor="member-name">Lägg till person utan inloggning</label>

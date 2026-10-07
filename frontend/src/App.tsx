@@ -20,6 +20,8 @@ export default function App() {
   const [tab, setTab] = useState<Tab>("shopping");
   const [showHousehold, setShowHousehold] = useState(false);
   const userId = session?.user.id;
+  // Demo visitors sign in anonymously and get their own demo household
+  const isDemo = session?.user.is_anonymous ?? false;
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -28,7 +30,7 @@ export default function App() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  // Look up the user's household after login
+  // Look up the user's household after login (demo visitors get one created)
   useEffect(() => {
     if (!userId) return;
     supabase
@@ -36,11 +38,26 @@ export default function App() {
       .select("household_id")
       .eq("user_id", userId)
       .maybeSingle()
-      .then(({ data }) => setHouseholdId(data?.household_id ?? null));
-  }, [userId]);
+      .then(async ({ data }) => {
+        if (data) {
+          setHouseholdId(data.household_id);
+        } else if (isDemo) {
+          const { data: demoId, error } = await supabase.rpc("create_demo_household");
+          if (error) alert(error.message);
+          setHouseholdId(demoId ?? null);
+        } else {
+          setHouseholdId(null);
+        }
+      });
+  }, [userId, isDemo]);
 
   function handleLogin() {
     supabase.auth.signInWithOAuth({ provider: "google" });
+  }
+
+  async function handleDemo() {
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) alert("Demon kunde inte starta just nu. Försök igen om en stund.");
   }
 
   function handleLogout() {
@@ -48,12 +65,20 @@ export default function App() {
     setHouseholdId(undefined);
   }
 
-  if (!session) return <LoginScreen onLogin={handleLogin} />;
+  if (!session) return <LoginScreen onLogin={handleLogin} onDemo={handleDemo} />;
   if (householdId === undefined) return <p className="loading">Laddar…</p>;
   if (householdId === null) return <Onboarding onReady={setHouseholdId} />;
 
   return (
     <div className="app">
+      {isDemo && (
+        <div className="demo-banner" role="status">
+          <span>Du testar en demo. Allt raderas efter ett dygn.</span>
+          <button type="button" className="text-button" onClick={handleLogout}>
+            Avsluta
+          </button>
+        </div>
+      )}
       <HouseholdInfo
         householdId={householdId}
         onOpenHousehold={() => setShowHousehold(true)}
@@ -63,6 +88,7 @@ export default function App() {
           <HouseholdScreen
             householdId={householdId}
             userId={session.user.id}
+            isDemo={isDemo}
             onBack={() => setShowHousehold(false)}
             onLeft={() => {
               setShowHousehold(false);
@@ -74,7 +100,7 @@ export default function App() {
             {tab === "shopping" && <ShoppingList householdId={householdId} />}
             {tab === "todos" && <TodoList householdId={householdId} />}
             {tab === "calendar" && <CalendarScreen householdId={householdId} />}
-          {tab === "medicine" && <MedicineScreen householdId={householdId} />}
+            {tab === "medicine" && <MedicineScreen householdId={householdId} />}
           </>
         )}
       </main>
@@ -83,7 +109,7 @@ export default function App() {
         className="text-button logout"
         onClick={handleLogout}
       >
-        Logga ut
+        {isDemo ? "Avsluta demo" : "Logga ut"}
       </button>
       <TabBar active={tab} onChange={setTab} />
     </div>
