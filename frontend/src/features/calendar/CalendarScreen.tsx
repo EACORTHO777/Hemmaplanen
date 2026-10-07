@@ -32,7 +32,9 @@ export default function CalendarScreen({ householdId }: Props) {
   });
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
-  const [swedishDays, setSwedishDays] = useState<Map<string, SwedishDay>>(new Map());
+  const [swedishDays, setSwedishDays] = useState<Map<string, SwedishDay>>(
+    new Map(),
+  );
 
   // Your events, live
   const fetchEvents = useCallback(() => {
@@ -65,9 +67,11 @@ export default function CalendarScreen({ householdId }: Props) {
       [now.getFullYear(), now.getMonth() + 1],
       [tomorrow.getFullYear(), tomorrow.getMonth() + 1],
     ];
-    Promise.all(wanted.map(([y, m]) => fetchSwedishMonth(y, m))).then((months) => {
-      setSwedishDays(new Map(months.flat().map((day) => [day.date, day])));
-    });
+    Promise.all(wanted.map(([y, m]) => fetchSwedishMonth(y, m))).then(
+      (months) => {
+        setSwedishDays(new Map(months.flat().map((day) => [day.date, day])));
+      },
+    );
   }, [shown, today]);
 
   function changeMonth(step: -1 | 1) {
@@ -79,8 +83,12 @@ export default function CalendarScreen({ householdId }: Props) {
   const people = toPeople(members);
   const eventColors = new Map<string, string[]>();
   for (const event of events) {
-    const color = people.find((p) => p.id === event.assigned_to)?.color ?? EVERYONE.color;
-    eventColors.set(event.date, [...(eventColors.get(event.date) ?? []), color]);
+    const color =
+      people.find((p) => p.id === event.assigned_to)?.color ?? EVERYONE.color;
+    eventColors.set(event.date, [
+      ...(eventColors.get(event.date) ?? []),
+      color,
+    ]);
   }
 
   const todayInfo = swedishDays.get(today);
@@ -89,10 +97,10 @@ export default function CalendarScreen({ householdId }: Props) {
   return (
     <>
       <section className="calendar-hero">
-        <div>
+        <h1>
           <span className="week-label">Vecka</span>
           <span className="week-number">{isoWeek(new Date())}</span>
-        </div>
+        </h1>
         <p className="today-label">{longDate(today)}</p>
       </section>
 
@@ -133,7 +141,12 @@ export default function CalendarScreen({ householdId }: Props) {
         onChanged={fetchEvents}
       />
 
-      <AddEvent householdId={householdId} date={selected} people={people} onAdded={fetchEvents} />
+      <AddEvent
+        householdId={householdId}
+        date={selected}
+        people={people}
+        onAdded={fetchEvents}
+      />
     </>
   );
 }
