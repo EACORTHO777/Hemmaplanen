@@ -38,6 +38,33 @@ jobs:
       - name: Type check and build
         run: npm run build
 
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: API tests (Vitest + Supertest)
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
   database:
     name: Database
     runs-on: ubuntu-latest
