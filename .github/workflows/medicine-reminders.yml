@@ -1,0 +1,42 @@
+name: Medicine reminders
+
+# Runs every 10 minutes. GitHub may start scheduled runs a few minutes late.
+# Note: GitHub pauses scheduled workflows after 60 days without repository activity.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # lets you run it by hand from the Actions tab
+
+# Never run two at once (the database also guarantees each reminder is sent once)
+concurrency:
+  group: medicine-reminders
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    name: Send due reminders
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Send reminders
+        run: npm run reminders
+        env:
+          SUPABASE_URL: https://ovccgihvauwvqtcqfgrk.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: https://hemmaplanen.vercel.app
