@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import cors from "cors";
 import express, { type ErrorRequestHandler } from "express";
 import rateLimit from "express-rate-limit";
@@ -45,6 +46,9 @@ export function createApp(env: Pick<Env, "FRONTEND_ORIGIN">, deps: Dependencies)
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });
   });
+  
+  // Report crashes to Sentry before answering with a plain 500
+  Sentry.setupExpressErrorHandler(app);
 
   // Never leak stack traces to the client
   const handleError: ErrorRequestHandler = (error, _req, res, _next) => {
