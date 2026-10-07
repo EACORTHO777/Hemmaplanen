@@ -29,6 +29,7 @@ export function fakeStore(): Store {
       Object.entries(members)
         .filter(([id, m]) => m.householdId === householdId && id !== exceptUserId)
         .map(([id]) => phone(id)),
+    claimMedicineReminders: async () => [],
     removeSubscription: async () => {},
   };
 }
