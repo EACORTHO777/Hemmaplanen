@@ -47,6 +47,7 @@ flowchart LR
 | Backend | Express 5, TypeScript, helmet, CORS, rate limiting, zod |
 | Push | `web-push` with VAPID keys |
 | CI/CD | GitHub Actions, Vercel and Render auto-deploy from `main` |
+| Monitoring | Sentry (frontend errors, EU region) |
 
 The database schema is described in [docs/schema.md](docs/schema.md).
 
@@ -72,6 +73,7 @@ Medicine logs are health data, a special category under GDPR Article 9. How it i
 - The service worker only caches the app shell, never household data.
 - Demo households use made-up data and are deleted every night.
 - Push notifications contain no more than needed (medicine name and person).
+- Error reports go to Sentry's EU region with user info, cookies, headers, request bodies and query params turned off, so they hold the error and stack trace but no household data. Session replay is not used.
 
 ## Tests
 
