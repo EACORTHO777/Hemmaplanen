@@ -61,6 +61,25 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"item_memory": {
+                  Row: {
+                    "amount": number | null,"category": string | null,"household_id": string,"name_key": string,"unit": string | null,"updated_at": string
+                  }
+                  Insert: {
+                    "amount"?: number | null,"category"?: string | null,"household_id": string,"name_key": string,"unit"?: string | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "amount"?: number | null,"category"?: string | null,"household_id"?: string,"name_key"?: string,"unit"?: string | null,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "item_memory_household_id_fkey"
+      columns: ["household_id"]
+isOneToOne: false
+      referencedRelation: "households"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"medicine_logs": {
                   Row: {
                     "given_at": string,"given_by": string | null,"given_to": string,"household_id": string,"id": string,"medicine_id": string
