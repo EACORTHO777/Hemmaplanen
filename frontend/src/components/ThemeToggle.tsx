@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon } from "lucide-react";
 
 type Theme = "light" | "dark";
 
@@ -20,7 +20,7 @@ function savedTheme(): Theme | null {
   }
 }
 
-// index.html already picked the theme before the first paint; this button switches it
+// index.html already picked the theme before the first paint; this switch changes it
 // and remembers the choice. Until the user picks one, the phone's setting is followed.
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() =>
@@ -51,13 +51,20 @@ export default function ThemeToggle() {
   }
 
   return (
-    <button
-      type="button"
-      className="icon-button theme-toggle"
-      onClick={toggle}
-      aria-label={theme === "dark" ? "Byt till ljust läge" : "Byt till mörkt läge"}
-    >
-      {theme === "dark" ? <Sun size={20} aria-hidden /> : <Moon size={20} aria-hidden />}
-    </button>
+    <section className="form-card settings-card">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={theme === "dark"}
+        className="setting-row"
+        onClick={toggle}
+      >
+        <Moon size={20} aria-hidden />
+        <span className="setting-label">Mörkt läge</span>
+        <span className="switch" aria-hidden="true">
+          <span className="switch-knob" />
+        </span>
+      </button>
+    </section>
   );
 }
