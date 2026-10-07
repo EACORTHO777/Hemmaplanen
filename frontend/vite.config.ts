@@ -41,7 +41,7 @@ export default defineConfig({
     }),
     // Uploads source maps to Sentry so stack traces show real file names, then deletes them from dist
     sentryVitePlugin({
-      org: 'lnu',
+      org: 'hemmaplanen',
       project: 'javascript-react',
       authToken: process.env.SENTRY_AUTH_TOKEN,
       sourcemaps: { filesToDeleteAfterUpload: ['./dist/**/*.map'] },
