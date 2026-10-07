@@ -347,3 +347,66 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* Inhalers */
+.inhalers {
+  margin-top: var(--space-5);
+}
+
+.inhalers-heading {
+  margin-bottom: var(--space-2);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.inhaler-card .section-head h3 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.inhaler-left {
+  color: var(--tone-ink);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.inhaler-count {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.inhaler-left.low,
+.inhaler-warning {
+  color: var(--red);
+}
+
+.inhaler-warning {
+  margin-top: var(--space-2);
+  font-weight: 600;
+}
+
+.medicine-progress-fill.low {
+  background: var(--red);
+}
+
+.inhaler-days {
+  margin-top: var(--space-3);
+  font-size: 15px;
+}
+
+.inhaler-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.text-button.danger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--red);
+}

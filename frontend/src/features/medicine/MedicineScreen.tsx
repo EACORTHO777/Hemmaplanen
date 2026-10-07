@@ -5,6 +5,7 @@ import { useLiveReload } from "../../lib/useLiveReload";
 import type { Database } from "../../types/database";
 import { toPeople } from "../household/people";
 import { toneStyle } from "../shopping/options";
+import Inhalers from "./Inhalers";
 import ManageMedicines from "./ManageMedicines";
 import MedicineCard from "./MedicineCard";
 import type { Medicine } from "./medicines";
@@ -186,6 +187,10 @@ export default function MedicineScreen({ householdId }: Props) {
             />
           );
         })}
+
+      {person?.id && (
+        <Inhalers householdId={householdId} personId={person.id} personName={person.name} />
+      )}
 
       <ManageMedicines
         householdId={householdId}
