@@ -1,5 +1,5 @@
-/// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
+import { configDefaults } from 'vitest/config'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
@@ -51,5 +51,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    // Playwright runs the e2e folder, not Vitest
+    exclude: [...configDefaults.exclude, 'e2e/**'],
   },
 })
