@@ -16,6 +16,7 @@
     "demo-cleanup": "node dist/jobs/runDemoCleanup.js"
   },
   "dependencies": {
+    "@sentry/node": "^11.5.0",
     "@supabase/supabase-js": "^2.117.2",
     "cors": "^2.8.6",
     "express": "^5.2.1",

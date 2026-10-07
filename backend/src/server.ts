@@ -1,3 +1,4 @@
+import "./instrument.ts";
 import { createApp } from "./app.ts";
 import { loadEnv } from "./env.ts";
 import { webPushSender } from "./push.ts";
