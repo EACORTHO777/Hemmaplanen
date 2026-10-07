@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import { Plus } from "lucide-react";
 import { supabase } from "../../lib/supabase";
-import { CATEGORIES, guessCategory, sectionFor, toneStyle } from "./options";
+import { useLiveReload } from "../../lib/useLiveReload";
+import { CATEGORIES, sectionFor, toneStyle } from "./options";
 import { parseQuickAdd } from "./parse";
+import { memoryKey, suggest, type Memory } from "./suggest";
 import type { Item } from "./types";
 
 type Props = {
@@ -10,16 +12,31 @@ type Props = {
   onAdded: (item: Item) => void;
 };
 
+function formatAmount(amount: number) {
+  return String(amount).replace(".", ",");
+}
+
 export default function QuickAdd({ householdId, onAdded }: Props) {
   const [text, setText] = useState("");
-  // undefined = use the automatic guess, null = no category
+  // undefined = use the suggestion, null = no category
   const [pickedCategory, setPickedCategory] = useState<string | null | undefined>(undefined);
   const [saving, setSaving] = useState(false);
+  const [memory, setMemory] = useState<Map<string, Memory>>(new Map());
 
-  const parsed = parseQuickAdd(text);
-  const category =
-    pickedCategory === undefined ? guessCategory(parsed.name) : pickedCategory;
-  const typing = parsed.name.length > 0;
+  // How this household usually buys things, learned by a database trigger
+  const loadMemory = useCallback(() => {
+    supabase
+      .from("item_memory")
+      .select("*")
+      .eq("household_id", householdId)
+      .then(({ data }) => setMemory(new Map((data ?? []).map((m) => [memoryKey(m.name_key), m]))));
+  }, [householdId]);
+
+  useLiveReload("item_memory", householdId, loadMemory);
+
+  const suggestion = suggest(parseQuickAdd(text), memory);
+  const category = pickedCategory === undefined ? suggestion.category : pickedCategory;
+  const typing = suggestion.name.length > 0;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,9 +47,9 @@ export default function QuickAdd({ householdId, onAdded }: Props) {
       .from("shopping_items")
       .insert({
         household_id: householdId,
-        name: parsed.name,
-        amount: parsed.amount,
-        unit: parsed.unit,
+        name: suggestion.name,
+        amount: suggestion.amount,
+        unit: suggestion.unit,
         category,
       })
       .select()
@@ -44,6 +61,7 @@ export default function QuickAdd({ householdId, onAdded }: Props) {
       return;
     }
     onAdded(data);
+    loadMemory(); // the trigger just learned from this item
     setText("");
     setPickedCategory(undefined);
   }
@@ -51,20 +69,26 @@ export default function QuickAdd({ householdId, onAdded }: Props) {
   return (
     <div className="quick-add">
       {typing && (
-        <div className="category-picker" role="group" aria-label="Kategori">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              className="chip chip-small tone"
-              style={toneStyle(sectionFor(c).color)}
-              aria-pressed={c === category}
-              onClick={() => setPickedCategory(c === category ? null : c)}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
+        <>
+          <p className="quick-add-preview" aria-live="polite">
+            Läggs till: {formatAmount(suggestion.amount)} {suggestion.unit} {suggestion.name}
+            {suggestion.remembered && <span className="quick-add-remembered"> · som vanligt</span>}
+          </p>
+          <div className="category-picker" role="group" aria-label="Kategori">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className="chip chip-small tone"
+                style={toneStyle(sectionFor(c).color)}
+                aria-pressed={c === category}
+                onClick={() => setPickedCategory(c === category ? null : c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </>
       )}
       <form className="quick-add-bar" onSubmit={handleSubmit}>
         <label htmlFor="quick-add-input" className="visually-hidden">
