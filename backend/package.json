@@ -12,7 +12,8 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "lint": "tsc --noEmit",
-    "reminders": "node dist/jobs/runMedicineReminders.js"
+    "reminders": "node dist/jobs/runMedicineReminders.js",
+    "demo-cleanup": "node dist/jobs/runDemoCleanup.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
