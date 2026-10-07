@@ -12,7 +12,7 @@
   font-size: 72px;
   font-weight: 700;
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.00em;
 }
 
 .week-label {
@@ -114,7 +114,7 @@
 }
 
 .day.outside {
-  opacity: 0.35;
+  opacity: 0.65;
 }
 
 .day.red {
