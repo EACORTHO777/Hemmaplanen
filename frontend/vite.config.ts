@@ -2,6 +2,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -38,7 +39,15 @@ export default defineConfig({
         importScripts: ['push-sw.js'],
       },
     }),
+    // Uploads source maps to Sentry so stack traces show real file names, then deletes them from dist
+    sentryVitePlugin({
+      org: 'lnu',
+      project: 'javascript-react',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      sourcemaps: { filesToDeleteAfterUpload: ['./dist/**/*.map'] },
+    }),
   ],
+  build: { sourcemap: 'hidden' },
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
