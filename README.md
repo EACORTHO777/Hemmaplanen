@@ -1,5 +1,7 @@
 # Hemmaplanen
 
+[![CI](https://github.com/EACORTHO777/Hemmaplanen/actions/workflows/ci.yml/badge.svg)](https://github.com/EACORTHO777/Hemmaplanen/actions/workflows/ci.yml)
+
 A household app for shopping, calendar, to-dos and medicine, used every day by my family. Installable as a PWA on iPhone and Android.
 
 **Live:** https://hemmaplanen.vercel.app (press **Prova demo** to try it with a made-up family, no login needed)
@@ -18,6 +20,17 @@ A household app for shopping, calendar, to-dos and medicine, used every day by m
 - **To-dos** – assigned to a household member or shared, filtered per person.
 - **Medicine** – log doses with a minimum interval per medicine (Alvedon/Ipren 4 h), status "wait / can give / should give", reminders at 1×, 1.5× and 2× the interval, inhaler counter with puffs left and low warning.
 - **Household** – invite code to join, members can be people without a login (kids), light and dark theme.
+
+## Design
+
+The first version used a generic green theme that looked like every other template, so I made four mockups before writing the real styles:
+
+- **A – Editorial:** cream background, big bold headings, lots of white space.
+- **B – Color-coded aisles:** each store section gets its own pastel color.
+- **C – Dark store mode:** dark background, lime accent, progress ring and quick-add bar.
+- **D – Combination:** C's layout, A's clarity and B's section colors.
+
+D became the light theme and C the dark theme. Section colors match the food (green for fruit and vegetables, light blue for dairy, brown for coffee), the font is Space Grotesk, and every color is a CSS variable so both themes share the same components.
 
 ## Architecture
 
