@@ -16,6 +16,7 @@ const HINTS: Partial<Record<PushState, string>> = {
 export default function NotificationsSetting({ householdId }: Props) {
   const [state, setState] = useState<PushState | null>(null);
   const [busy, setBusy] = useState(false);
+  const [testResult, setTestResult] = useState<string | null>(null);
 
   useEffect(() => {
     currentPushState().then(setState);
@@ -33,8 +34,22 @@ export default function NotificationsSetting({ householdId }: Props) {
   }
 
   async function sendTest() {
-    const response = await callApi("/notifications/test");
-    if (!response?.ok) alert("Kunde inte nå servern. Försök igen om en minut.");
+    setTestResult("Skickar… (första gången kan ta upp till en minut)");
+    try {
+      const response = await callApi("/notifications/test");
+      if (!response?.ok) {
+        setTestResult("Kunde inte nå servern. Försök igen om en minut.");
+        return;
+      }
+      const { delivered } = (await response.json()) as { delivered: number };
+      setTestResult(
+        delivered > 0
+          ? `Skickad till ${delivered} ${delivered === 1 ? "enhet" : "enheter"}.`
+          : "Ingen enhet tog emot den. Slå av och på aviseringar och försök igen.",
+      );
+    } catch {
+      setTestResult("Kunde inte nå servern. Försök igen om en minut.");
+    }
   }
 
   if (state === null) return null;
@@ -61,6 +76,11 @@ export default function NotificationsSetting({ householdId }: Props) {
         <button type="button" className="text-button setting-hint" onClick={sendTest}>
           Skicka en testnotis
         </button>
+      )}
+      {testResult && (
+        <p className="setting-hint" aria-live="polite">
+          {testResult}
+        </p>
       )}
     </section>
   );
