@@ -7,6 +7,10 @@ const schema = z.object({
   FRONTEND_ORIGIN: z.url(),
   SUPABASE_URL: z.url(),
   SUPABASE_SECRET_KEY: z.string().min(1),
+  VAPID_PUBLIC_KEY: z.string().min(1),
+  VAPID_PRIVATE_KEY: z.string().min(1),
+  // Who push services can contact about this sender (a URL or mailto:)
+  VAPID_SUBJECT: z.string().startsWith("https://").or(z.string().startsWith("mailto:")),
 });
 
 export type Env = z.infer<typeof schema>;

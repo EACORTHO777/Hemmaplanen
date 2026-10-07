@@ -4,9 +4,14 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { requireUser, type VerifyToken } from "./auth.ts";
 import type { Env } from "./env.ts";
+import { notificationsRouter } from "./notifications.ts";
+import type { PushSender } from "./push.ts";
+import type { Store } from "./store.ts";
 
 type Dependencies = {
   verifyToken: VerifyToken;
+  store: Store;
+  push: PushSender;
 };
 
 export function createApp(env: Pick<Env, "FRONTEND_ORIGIN">, deps: Dependencies) {
@@ -34,6 +39,8 @@ export function createApp(env: Pick<Env, "FRONTEND_ORIGIN">, deps: Dependencies)
   app.get("/me", (_req, res) => {
     res.json({ userId: res.locals.userId });
   });
+
+  app.use("/notifications", notificationsRouter(deps.store, deps.push));
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });

@@ -34,6 +34,8 @@ export default defineConfig({
         // Data from Supabase is never cached: it always comes live from the network.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
+        // Adds the push notification handlers to the generated service worker
+        importScripts: ['push-sw.js'],
       },
     }),
   ],
