@@ -362,6 +362,21 @@ button {
   font-weight: 600;
 }
 
+.setting-row:disabled {
+  cursor: default;
+}
+
+.setting-hint {
+  display: block;
+  margin: 0 var(--space-2) var(--space-3);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.settings-card + .settings-card {
+  margin-top: var(--space-3);
+}
+
 /* iOS-style switch, driven by aria-checked on the button */
 .switch {
   position: relative;

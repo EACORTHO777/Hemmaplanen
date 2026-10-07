@@ -1,5 +1,6 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { Plus } from "lucide-react";
+import { notifyInBackground } from "../../lib/api";
 import { supabase } from "../../lib/supabase";
 import { useLiveReload } from "../../lib/useLiveReload";
 import { CATEGORIES, sectionFor, toneStyle } from "./options";
@@ -62,6 +63,7 @@ export default function QuickAdd({ householdId, onAdded }: Props) {
     }
     onAdded(data);
     loadMemory(); // the trigger just learned from this item
+    notifyInBackground("/notifications/item-added", { itemId: data.id });
     setText("");
     setPickedCategory(undefined);
   }

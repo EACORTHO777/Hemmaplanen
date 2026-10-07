@@ -1,11 +1,12 @@
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp } from "./app.ts";
+import { fakePush, fakeStore } from "./test/fakes.ts";
 
 const env = { FRONTEND_ORIGIN: "https://hemmaplanen.vercel.app" };
 // A fake token check: only "good-token" belongs to a user
 const verifyToken = async (token: string) => (token === "good-token" ? "user-1" : null);
-const app = createApp(env, { verifyToken });
+const app = createApp(env, { verifyToken, store: fakeStore(), push: fakePush() });
 
 describe("API basics", () => {
   it("answers the health check", async () => {
@@ -35,7 +36,7 @@ describe("API basics", () => {
   });
 
   it("rate limits after 100 requests per minute", async () => {
-    const limited = createApp(env, { verifyToken });
+    const limited = createApp(env, { verifyToken, store: fakeStore(), push: fakePush() });
     for (let i = 0; i < 100; i++) await request(limited).get("/health");
     const response = await request(limited).get("/health");
     expect(response.status).toBe(429);

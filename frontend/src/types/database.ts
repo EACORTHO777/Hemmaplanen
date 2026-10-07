@@ -155,6 +155,25 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"push_subscriptions": {
+                  Row: {
+                    "auth": string,"created_at": string,"endpoint": string,"household_id": string,"id": string,"p256dh": string,"user_id": string
+                  }
+                  Insert: {
+                    "auth": string,"created_at"?: string,"endpoint": string,"household_id": string,"id"?: string,"p256dh": string,"user_id"?: string
+                  }
+                  Update: {
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"household_id"?: string,"id"?: string,"p256dh"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "push_subscriptions_household_id_fkey"
+      columns: ["household_id"]
+isOneToOne: false
+      referencedRelation: "households"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"shopping_items": {
                   Row: {
                     "amount": number | null,"category": string | null,"created_at": string,"done": boolean,"household_id": string,"id": string,"name": string,"unit": string | null

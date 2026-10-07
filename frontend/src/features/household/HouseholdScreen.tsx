@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
 import InviteCard from "./InviteCard";
 import ThemeToggle from "../../components/ThemeToggle";
+import NotificationsSetting from "../notifications/NotificationsSetting";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -162,6 +163,7 @@ export default function HouseholdScreen({
       </form>
 
       <h2 className="settings-heading">Inställningar</h2>
+      <NotificationsSetting householdId={householdId} />
       <ThemeToggle />
     </>
   );
