@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { useLiveReload } from "../../lib/useLiveReload";
 import type { Database } from "../../types/database";
 import { toPeople } from "../household/people";
 import { toneStyle } from "../shopping/options";
@@ -30,8 +31,6 @@ export default function MedicineScreen({ householdId }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [medicines, setMedicines] = useState<Medicine[]>([]);
-  // Bumped after adding/editing a medicine so the list reloads right away
-  const [medicinesVersion, setMedicinesVersion] = useState(0);
   const [personId, setPersonId] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -50,56 +49,28 @@ export default function MedicineScreen({ householdId }: Props) {
       .then(({ data }) => setMembers(data ?? []));
   }, [householdId]);
 
-  useEffect(() => {
-    function fetchMedicines() {
-      supabase
-        .from("medicines")
-        .select("*")
-        .eq("household_id", householdId)
-        .order("created_at")
-        .then(({ data }) => setMedicines(data ?? []));
-    }
-
-    fetchMedicines();
-    const channel = supabase
-      .channel(`medicines:${householdId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "medicines" },
-        () => fetchMedicines(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [householdId, medicinesVersion]);
-
-  useEffect(() => {
-    function fetchLogs() {
-      supabase
-        .from("medicine_logs")
-        .select("*")
-        .eq("household_id", householdId)
-        .order("given_at", { ascending: false })
-        .limit(200)
-        .then(({ data }) => setLogs(data ?? []));
-    }
-
-    fetchLogs();
-    const channel = supabase
-      .channel(`medicine_logs:${householdId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "medicine_logs" },
-        () => fetchLogs(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const fetchMedicines = useCallback(() => {
+    supabase
+      .from("medicines")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("created_at")
+      .then(({ data }) => setMedicines(data ?? []));
   }, [householdId]);
+
+  useLiveReload("medicines", householdId, fetchMedicines);
+
+  const fetchLogs = useCallback(() => {
+    supabase
+      .from("medicine_logs")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("given_at", { ascending: false })
+      .limit(200)
+      .then(({ data }) => setLogs(data ?? []));
+  }, [householdId]);
+
+  useLiveReload("medicine_logs", householdId, fetchLogs);
 
   const people = toPeople(members);
   // Default to the first person without a login (usually a child)
@@ -126,7 +97,11 @@ export default function MedicineScreen({ householdId }: Props) {
       given_at: givenAt.toISOString(),
     });
     // The database refuses doses closer than the medicine allows
-    if (error) alert(error.message);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    fetchLogs();
   }
 
   async function changeTime(log: Log, givenAt: Date) {
@@ -134,7 +109,11 @@ export default function MedicineScreen({ householdId }: Props) {
       .from("medicine_logs")
       .update({ given_at: givenAt.toISOString() })
       .eq("id", log.id);
-    if (error) alert(error.message);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    fetchLogs();
   }
 
   async function removeMedicine(medicine: Medicine) {
@@ -153,7 +132,11 @@ export default function MedicineScreen({ householdId }: Props) {
   async function removeLog(log: Log) {
     if (!confirm(`Ta bort ${medicineName(log.medicine_id)} ${dateTime(log.given_at)}?`)) return;
     const { error } = await supabase.from("medicine_logs").delete().eq("id", log.id);
-    if (error) alert(error.message);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    fetchLogs();
   }
 
   return (
@@ -209,7 +192,7 @@ export default function MedicineScreen({ householdId }: Props) {
         medicines={medicines}
         people={people}
         selectedPersonId={activeId}
-        onChanged={() => setMedicinesVersion((v) => v + 1)}
+        onChanged={fetchMedicines}
         onRemove={removeMedicine}
       />
 

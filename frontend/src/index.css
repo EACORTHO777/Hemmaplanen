@@ -38,23 +38,22 @@
   --content-width: 480px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #0e0f11;
-    --surface: #17191c;
-    --text: #f2f3f0;
-    --muted: #8d9196;
-    --line: #2c3035;
-    --line-soft: #24272b;
-    --box-line: #4a5057;
-    --accent: #c8f05a;
-    --accent-contrast: #0e0f11;
-    --highlight: #262c1a;
-    --highlight-ink: #c8f05a;
-    --ring-track: #24272b;
-    --red: #ff8a7a;
-  }
+/* Dark theme (direction C). data-theme is set before the first paint in index.html */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e0f11;
+  --surface: #17191c;
+  --text: #f2f3f0;
+  --muted: #8d9196;
+  --line: #2c3035;
+  --line-soft: #24272b;
+  --box-line: #4a5057;
+  --accent: #c8f05a;
+  --accent-contrast: #0e0f11;
+  --highlight: #262c1a;
+  --highlight-ink: #c8f05a;
+  --ring-track: #24272b;
+  --red: #ff8a7a;
 }
 
 /*
@@ -68,13 +67,11 @@
   --tone-strong: color-mix(in srgb, var(--section), #000000 38%);
 }
 
-@media (prefers-color-scheme: dark) {
-  .tone {
-    --tone-card: color-mix(in srgb, var(--section) 14%, var(--bg));
-    --tone-soft: color-mix(in srgb, var(--section) 16%, var(--surface));
-    --tone-ink: var(--section);
-    --tone-strong: var(--section);
-  }
+[data-theme="dark"] .tone {
+  --tone-card: color-mix(in srgb, var(--section) 14%, var(--bg));
+  --tone-soft: color-mix(in srgb, var(--section) 16%, var(--surface));
+  --tone-ink: var(--section);
+  --tone-strong: var(--section);
 }
 
 /* Reset */
@@ -262,6 +259,9 @@ button {
   top: 0;
   right: 0;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .household-avatar {
@@ -336,6 +336,11 @@ button {
 
 .icon-button:hover {
   background: var(--line-soft);
+}
+
+.theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--line);
 }
 
 .back-button {
