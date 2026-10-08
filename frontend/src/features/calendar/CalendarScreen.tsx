@@ -9,6 +9,7 @@ import MonthGrid from "./MonthGrid";
 import DayEvents from "./DayEvents";
 import AddEvent from "./AddEvent";
 import "./calendar.css";
+import LoadState, { type Status } from "../../components/LoadState";
 
 type CalendarEvent = Database["public"]["Tables"]["events"]["Row"];
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -31,6 +32,7 @@ export default function CalendarScreen({ householdId }: Props) {
     month: new Date().getMonth() + 1,
   });
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [status, setStatus] = useState<Status>("loading");
   const [members, setMembers] = useState<Member[]>([]);
   const [swedishDays, setSwedishDays] = useState<Map<string, SwedishDay>>(
     new Map(),
@@ -44,7 +46,14 @@ export default function CalendarScreen({ householdId }: Props) {
       .eq("household_id", householdId)
       .order("date")
       .order("time")
-      .then(({ data }) => setEvents(data ?? []));
+      .then(({ data, error }) => {
+        if (error) {
+          setStatus((s) => (s === "ready" ? "ready" : "error"));
+          return;
+        }
+        setEvents(data);
+        setStatus("ready");
+      });
   }, [householdId]);
 
   useLiveReload("events", householdId, fetchEvents);
@@ -93,6 +102,18 @@ export default function CalendarScreen({ householdId }: Props) {
 
   const todayInfo = swedishDays.get(today);
   const tomorrowInfo = swedishDays.get(addDays(today, 1));
+
+  if (status !== "ready") {
+    return (
+      <LoadState
+        status={status}
+        onRetry={() => {
+          setStatus("loading");
+          fetchEvents();
+        }}
+      />
+    );
+  }
 
   return (
     <>

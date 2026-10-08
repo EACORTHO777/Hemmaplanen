@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabase";
 import type { Person } from "../household/people";
 import { toneStyle } from "../shopping/options";
 import { formatInterval, MEDICINE_COLORS, type Medicine } from "./medicines";
+import { showError } from "../../lib/toast";
 
 type Props = {
   householdId: string;
@@ -65,7 +66,7 @@ export default function ManageMedicines({
       ? await supabase.from("medicines").update(values).eq("id", editing.id)
       : await supabase.from("medicines").insert({ household_id: householdId, ...values });
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte spara medicinen.");
       return;
     }
     onChanged();

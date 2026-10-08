@@ -5,6 +5,7 @@ import { useLiveReload } from "../../lib/useLiveReload";
 import type { Database } from "../../types/database";
 import { toneStyle } from "../shopping/options";
 import { MEDICINE_COLORS } from "./medicines";
+import { showError } from "../../lib/toast";
 
 // Remaining, today and yesterday come from the inhaler_overview view in the database
 type Overview = Database["public"]["Views"]["inhaler_overview"]["Row"];
@@ -46,7 +47,7 @@ export default function Inhalers({ householdId, personId, personName }: Props) {
     setBusy(id);
     const { error } = await action();
     setBusy(null);
-    if (error) alert(error instanceof Error ? error.message : "Något gick fel");
+    if (error) showError(error, "Kunde inte spara puffen.");
     load();
   }
 
@@ -217,7 +218,7 @@ function InhalerForm({ householdId, personId, personName, inhaler, onDone }: For
           .from("inhalers")
           .insert({ household_id: householdId, member_id: personId, ...values, ...restart });
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte spara inhalatorn.");
       return;
     }
     onDone();
@@ -228,7 +229,7 @@ function InhalerForm({ householdId, personId, personName, inhaler, onDone }: For
     if (!confirm(`Ta bort ${inhaler.name}? Alla puffar i historiken försvinner också.`)) return;
     const { error } = await supabase.from("inhalers").delete().eq("id", inhaler.id!);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte ta bort inhalatorn.");
       return;
     }
     onDone();

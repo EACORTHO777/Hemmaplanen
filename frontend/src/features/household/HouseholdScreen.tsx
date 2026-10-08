@@ -1,10 +1,12 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
 import type { Database } from "../../types/database";
 import InviteCard from "./InviteCard";
 import ThemeToggle from "../../components/ThemeToggle";
 import NotificationsSetting from "../notifications/NotificationsSetting";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { showError } from "../../lib/toast";
+import LoadState, { type Status } from "../../components/LoadState";
 
 type Member = Database["public"]["Tables"]["members"]["Row"];
 
@@ -24,6 +26,7 @@ export default function HouseholdScreen({
   isDemo,
 }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
+  const [status, setStatus] = useState<Status>("loading");
   const [name, setName] = useState("");
   const [householdName, setHouseholdName] = useState("");
 
@@ -38,14 +41,23 @@ export default function HouseholdScreen({
       });
   }, [householdId]);
 
-  useEffect(() => {
+  const fetchMembers = useCallback(() => {
     supabase
       .from("members")
       .select("*")
       .eq("household_id", householdId)
       .order("created_at")
-      .then(({ data }) => setMembers(data ?? []));
+      .then(({ data, error }) => {
+        if (error) {
+          setStatus("error");
+          return;
+        }
+        setMembers(data);
+        setStatus("ready");
+      });
   }, [householdId]);
+
+  useEffect(fetchMembers, [fetchMembers]);
 
   async function addMember(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,7 +67,7 @@ export default function HouseholdScreen({
       .select()
       .single();
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte lägga till personen.");
       return;
     }
     setMembers([...members, data]);
@@ -71,7 +83,7 @@ export default function HouseholdScreen({
       .update({ display_name: newName })
       .eq("id", member.id);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte byta namn.");
       return;
     }
     setMembers(
@@ -93,7 +105,7 @@ export default function HouseholdScreen({
       .delete()
       .eq("id", member.id);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte ta bort personen.");
       return;
     }
     if (isMe) {
@@ -112,6 +124,14 @@ export default function HouseholdScreen({
       <p className="eyebrow screen-eyebrow">Hushåll</p>
       <h1 className="page-title screen-title">{householdName}</h1>
 
+      {/* Only the member list waits for data; settings and log out stay usable */}
+      <LoadState
+        status={status}
+        onRetry={() => {
+          setStatus("loading");
+          fetchMembers();
+        }}
+      />
       <ul className="member-list">
         {members.map((member) => (
           <li key={member.id} className="member-row">

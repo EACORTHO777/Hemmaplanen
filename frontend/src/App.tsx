@@ -10,6 +10,7 @@ import TodoList from "./features/todos/TodoList";
 import CalendarScreen from "./features/calendar/CalendarScreen";
 import MedicineScreen from "./features/medicine/MedicineScreen";
 import HouseholdScreen from "./features/household/HouseholdScreen";
+import { showError } from "./lib/toast";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -43,7 +44,7 @@ export default function App() {
           setHouseholdId(data.household_id);
         } else if (isDemo) {
           const { data: demoId, error } = await supabase.rpc("create_demo_household");
-          if (error) alert(error.message);
+          if (error) showError(error);
           setHouseholdId(demoId ?? null);
         } else {
           setHouseholdId(null);
@@ -57,7 +58,7 @@ export default function App() {
 
   async function handleDemo() {
     const { error } = await supabase.auth.signInAnonymously();
-    if (error) alert("Demon kunde inte starta just nu. Försök igen om en stund.");
+    if (error) showError(error, "Demon kunde inte starta just nu. Försök igen om en stund.");
   }
 
   function handleLogout() {

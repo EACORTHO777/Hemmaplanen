@@ -5,6 +5,8 @@ import { toneStyle } from "../shopping/options";
 import type { Database } from "../../types/database";
 import AddTodo from "./AddTodo";
 import { EVERYONE, toPeople } from "../household/people";
+import LoadState, { type Status } from "../../components/LoadState";
+import { showError } from "../../lib/toast";
 
 type Todo = Database["public"]["Tables"]["todos"]["Row"];
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -15,6 +17,7 @@ type Props = {
 
 export default function TodoList({ householdId }: Props) {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [status, setStatus] = useState<Status>("loading");
   const [members, setMembers] = useState<Member[]>([]);
   const [filter, setFilter] = useState<string | null>(null);
 
@@ -33,7 +36,14 @@ export default function TodoList({ householdId }: Props) {
       .select("*")
       .eq("household_id", householdId)
       .order("created_at")
-      .then(({ data }) => setTodos(data ?? []));
+      .then(({ data, error }) => {
+        if (error) {
+          setStatus((s) => (s === "ready" ? "ready" : "error"));
+          return;
+        }
+        setTodos(data);
+        setStatus("ready");
+      });
   }, [householdId]);
 
   useLiveReload("todos", householdId, fetchTodos);
@@ -44,7 +54,7 @@ export default function TodoList({ householdId }: Props) {
       .update({ done: !todo.done })
       .eq("id", todo.id);
     if (error) {
-      alert(error.message);
+      showError(error);
       return;
     }
     setTodos(
@@ -59,7 +69,7 @@ export default function TodoList({ householdId }: Props) {
       .eq("household_id", householdId)
       .eq("done", true);
     if (error) {
-      alert(error.message);
+      showError(error);
       return;
     }
     setTodos(todos.filter((t) => !t.done));
@@ -89,6 +99,18 @@ export default function TodoList({ householdId }: Props) {
   const visibleGroups = activeFilter
     ? groups.filter((g) => g.person.name === activeFilter)
     : groups;
+
+  if (status !== "ready") {
+    return (
+      <LoadState
+        status={status}
+        onRetry={() => {
+          setStatus("loading");
+          fetchTodos();
+        }}
+      />
+    );
+  }
 
   return (
     <>

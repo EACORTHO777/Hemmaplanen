@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
+import { showError } from "../../lib/toast";
 
 type Props = {
   onJoined: (householdId: string) => void;
@@ -14,7 +15,7 @@ export default function JoinHousehold({ onJoined }: Props) {
       code: code.trim().toLowerCase(),
     });
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte gå med i hushållet.");
       return;
     }
     onJoined(data);

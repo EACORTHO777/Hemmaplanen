@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabase";
 import { EVERYONE, type Person } from "../household/people";
 import { toneStyle } from "../shopping/options";
 import { fromIsoDate } from "./dates";
+import { showError } from "../../lib/toast";
 
 type Props = {
   householdId: string;
@@ -39,7 +40,7 @@ export default function AddEvent({ householdId, date, people, onAdded }: Props) 
       assigned_to: assignedTo,
     });
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte spara händelsen.");
       return;
     }
     onAdded();

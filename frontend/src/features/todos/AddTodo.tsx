@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import type { Person } from "../household/people";
 import { toneStyle } from "../shopping/options";
+import { showError } from "../../lib/toast";
 
 type Props = {
   householdId: string;
@@ -24,7 +25,7 @@ export default function AddTodo({ householdId, people, onAdded }: Props) {
       assigned_to: assignedTo,
     });
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte spara uppgiften.");
       return;
     }
     onAdded();

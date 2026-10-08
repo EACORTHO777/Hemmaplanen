@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "../../lib/supabase";
+import { showError } from "../../lib/toast";
 
 type Props = {
   onCreated: (householdId: string) => void;
@@ -14,7 +15,7 @@ export default function CreateHousehold({ onCreated }: Props) {
       household_name: name,
     });
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte skapa hushållet.");
       return;
     }
     onCreated(data);
