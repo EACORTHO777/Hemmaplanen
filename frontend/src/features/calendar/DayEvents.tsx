@@ -5,6 +5,7 @@ import type { Database } from "../../types/database";
 import { EVERYONE, type Person } from "../household/people";
 import { toneStyle } from "../shopping/options";
 import { longDate } from "./dates";
+import { showError } from "../../lib/toast";
 
 type CalendarEvent = Database["public"]["Tables"]["events"]["Row"];
 
@@ -21,7 +22,7 @@ export default function DayEvents({ date, events, people, info, onChanged }: Pro
     if (!confirm(`Ta bort "${event.title}"?`)) return;
     const { error } = await supabase.from("events").delete().eq("id", event.id);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte ta bort händelsen.");
       return;
     }
     onChanged();

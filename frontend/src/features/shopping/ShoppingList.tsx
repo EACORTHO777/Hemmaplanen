@@ -7,6 +7,8 @@ import QuickAdd from "./QuickAdd";
 import { OTHER_SECTION, SECTIONS, sectionFor, toneStyle } from "./options";
 import type { Item } from "./types";
 import "./shopping.css";
+import LoadState, { type Status } from "../../components/LoadState";
+import { showError } from "../../lib/toast";
 
 type Props = {
   householdId: string;
@@ -14,6 +16,7 @@ type Props = {
 
 export default function ShoppingList({ householdId }: Props) {
   const [items, setItems] = useState<Item[]>([]);
+  const [status, setStatus] = useState<Status>("loading");
   const [filter, setFilter] = useState<string | null>(null);
 
   const fetchItems = useCallback(() => {
@@ -22,7 +25,14 @@ export default function ShoppingList({ householdId }: Props) {
       .select("*")
       .eq("household_id", householdId)
       .order("created_at")
-      .then(({ data }) => setItems(data ?? []));
+      .then(({ data, error }) => {
+        if (error) {
+          setStatus((s) => (s === "ready" ? "ready" : "error"));
+          return;
+        }
+        setItems(data);
+        setStatus("ready");
+      });
   }, [householdId]);
 
   useLiveReload("shopping_items", householdId, fetchItems);
@@ -33,7 +43,7 @@ export default function ShoppingList({ householdId }: Props) {
       .update({ done: !item.done })
       .eq("id", item.id);
     if (error) {
-      alert(error.message);
+      showError(error);
       return;
     }
     setItems(
@@ -48,14 +58,16 @@ export default function ShoppingList({ householdId }: Props) {
       .eq("household_id", householdId)
       .eq("done", true);
     if (error) {
-      alert(error.message);
+      showError(error);
       return;
     }
     setItems(items.filter((i) => !i.done));
   }
 
   function addItem(item: Item) {
-    setItems((prev) => (prev.some((i) => i.id === item.id) ? prev : [...prev, item]));
+    setItems((prev) =>
+      prev.some((i) => i.id === item.id) ? prev : [...prev, item],
+    );
   }
 
   const doneCount = items.filter((i) => i.done).length;
@@ -67,22 +79,44 @@ export default function ShoppingList({ householdId }: Props) {
       const inSection = items.filter((i) => sectionFor(i.category) === section);
       const open = inSection.filter((i) => !i.done);
       const done = inSection.filter((i) => i.done);
-      return { section, items: [...open, ...done], left: open.length, done: done.length };
+      return {
+        section,
+        items: [...open, ...done],
+        left: open.length,
+        done: done.length,
+      };
     })
     .filter((group) => group.items.length > 0);
 
-  const activeFilter = groups.some((g) => g.section.title === filter) ? filter : null;
+  const activeFilter = groups.some((g) => g.section.title === filter)
+    ? filter
+    : null;
   const visibleGroups = activeFilter
     ? groups.filter((g) => g.section.title === activeFilter)
     : groups;
   const segments = groups
     .filter((g) => g.done > 0)
     .map((g) => ({ color: g.section.color, count: g.done }));
+  if (status !== "ready") {
+    return (
+      <LoadState
+        status={status}
+        onRetry={() => {
+          setStatus("loading");
+          fetchItems();
+        }}
+      />
+    );
+  }
 
   return (
     <>
       <section className="shopping-summary" aria-label="Översikt">
-        <ProgressRing segments={segments} total={items.length} remaining={remaining} />
+        <ProgressRing
+          segments={segments}
+          total={items.length}
+          remaining={remaining}
+        />
         <div>
           <h1 className="page-title">Handla</h1>
           <p className="summary-text">
@@ -114,7 +148,9 @@ export default function ShoppingList({ householdId }: Props) {
               style={toneStyle(g.section.color)}
               aria-pressed={activeFilter === g.section.title}
               onClick={() =>
-                setFilter(activeFilter === g.section.title ? null : g.section.title)
+                setFilter(
+                  activeFilter === g.section.title ? null : g.section.title,
+                )
               }
             >
               {g.section.short} {g.items.length}
@@ -137,7 +173,9 @@ export default function ShoppingList({ householdId }: Props) {
         >
           <div className="section-head">
             <h2>{g.section.title}</h2>
-            <span className="section-left">{g.left > 0 ? `${g.left} kvar` : "Klart"}</span>
+            <span className="section-left">
+              {g.left > 0 ? `${g.left} kvar` : "Klart"}
+            </span>
           </div>
           <ul className="item-list">
             {g.items.map((item) => (

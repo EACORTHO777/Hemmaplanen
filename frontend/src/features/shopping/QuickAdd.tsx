@@ -7,6 +7,7 @@ import { CATEGORIES, sectionFor, toneStyle } from "./options";
 import { parseQuickAdd } from "./parse";
 import { memoryKey, suggest, type Memory } from "./suggest";
 import type { Item } from "./types";
+import { showError } from "../../lib/toast";
 
 type Props = {
   householdId: string;
@@ -58,7 +59,7 @@ export default function QuickAdd({ householdId, onAdded }: Props) {
     setSaving(false);
 
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte lägga till varan.");
       return;
     }
     onAdded(data);

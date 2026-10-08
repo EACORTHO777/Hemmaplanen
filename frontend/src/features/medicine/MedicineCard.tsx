@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { toneStyle } from "../shopping/options";
 import { formatInterval, type Medicine } from "./medicines";
+import { showMessage } from "../../lib/toast";
 
 const MINUTE = 60 * 1000;
 
@@ -110,7 +111,7 @@ export default function MedicineCard({
     const others = mode === "edit" ? doses.slice(1) : doses;
     const clash = others.find((dose) => Math.abs(dose - givenAt.getTime()) < interval);
     if (clash !== undefined) {
-      alert(
+      showMessage(
         `För tidigt: ${medicine.name} gavs ${dayAndTime(clash, now)}. ` +
           `Det ska gå minst ${formatInterval(medicine.min_interval_minutes)} mellan doserna, ` +
           `så tidigast ${dayAndTime(clash + interval, now)}.`,

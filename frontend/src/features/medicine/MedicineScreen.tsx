@@ -10,6 +10,8 @@ import ManageMedicines from "./ManageMedicines";
 import MedicineCard from "./MedicineCard";
 import type { Medicine } from "./medicines";
 import "./medicine.css";
+import LoadState, { type Status } from "../../components/LoadState";
+import { showError } from "../../lib/toast";
 
 type Log = Database["public"]["Tables"]["medicine_logs"]["Row"];
 type Member = Database["public"]["Tables"]["members"]["Row"];
@@ -32,6 +34,8 @@ export default function MedicineScreen({ householdId }: Props) {
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [medicines, setMedicines] = useState<Medicine[]>([]);
+  const [medicinesStatus, setMedicinesStatus] = useState<Status>("loading");
+  const [logsStatus, setLogsStatus] = useState<Status>("loading");
   const [personId, setPersonId] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -56,7 +60,14 @@ export default function MedicineScreen({ householdId }: Props) {
       .select("*")
       .eq("household_id", householdId)
       .order("created_at")
-      .then(({ data }) => setMedicines(data ?? []));
+      .then(({ data, error }) => {
+        if (error) {
+          setMedicinesStatus((s) => (s === "ready" ? "ready" : "error"));
+          return;
+        }
+        setMedicines(data);
+        setMedicinesStatus("ready");
+      });
   }, [householdId]);
 
   useLiveReload("medicines", householdId, fetchMedicines);
@@ -68,7 +79,14 @@ export default function MedicineScreen({ householdId }: Props) {
       .eq("household_id", householdId)
       .order("given_at", { ascending: false })
       .limit(200)
-      .then(({ data }) => setLogs(data ?? []));
+      .then(({ data, error }) => {
+        if (error) {
+          setLogsStatus((s) => (s === "ready" ? "ready" : "error"));
+          return;
+        }
+        setLogs(data);
+        setLogsStatus("ready");
+      });
   }, [householdId]);
 
   useLiveReload("medicine_logs", householdId, fetchLogs);
@@ -99,7 +117,7 @@ export default function MedicineScreen({ householdId }: Props) {
     });
     // The database refuses doses closer than the medicine allows
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte spara dosen.");
       return;
     }
     fetchLogs();
@@ -111,7 +129,7 @@ export default function MedicineScreen({ householdId }: Props) {
       .update({ given_at: givenAt.toISOString() })
       .eq("id", log.id);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte ändra tiden.");
       return;
     }
     fetchLogs();
@@ -122,7 +140,7 @@ export default function MedicineScreen({ householdId }: Props) {
     if (!confirm(question)) return;
     const { error } = await supabase.from("medicines").delete().eq("id", medicine.id);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte ta bort medicinen.");
       return;
     }
     // Don't wait for realtime: remove the card and its history right away
@@ -134,10 +152,32 @@ export default function MedicineScreen({ householdId }: Props) {
     if (!confirm(`Ta bort ${medicineName(log.medicine_id)} ${dateTime(log.given_at)}?`)) return;
     const { error } = await supabase.from("medicine_logs").delete().eq("id", log.id);
     if (error) {
-      alert(error.message);
+      showError(error, "Kunde inte ta bort dosen.");
       return;
     }
     fetchLogs();
+  }
+
+  // Both medicines and their history are needed before the cards make sense
+  const status: Status =
+    medicinesStatus === "error" || logsStatus === "error"
+      ? "error"
+      : medicinesStatus === "loading" || logsStatus === "loading"
+        ? "loading"
+        : "ready";
+
+  if (status !== "ready") {
+    return (
+      <LoadState
+        status={status}
+        onRetry={() => {
+          setMedicinesStatus("loading");
+          setLogsStatus("loading");
+          fetchMedicines();
+          fetchLogs();
+        }}
+      />
+    );
   }
 
   return (

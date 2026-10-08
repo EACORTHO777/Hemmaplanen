@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { callApi } from "../../lib/api";
 import { currentPushState, turnOffPush, turnOnPush, type PushState } from "./push";
+import { showError } from "../../lib/toast";
 
 type Props = {
   householdId: string;
@@ -27,7 +28,7 @@ export default function NotificationsSetting({ householdId }: Props) {
     try {
       setState(state === "on" ? await turnOffPush() : await turnOnPush(householdId));
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Kunde inte ändra aviseringar");
+      showError(error, "Kunde inte ändra aviseringar.");
     } finally {
       setBusy(false);
     }
