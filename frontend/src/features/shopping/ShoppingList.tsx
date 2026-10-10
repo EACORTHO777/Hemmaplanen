@@ -9,6 +9,7 @@ import type { Item } from "./types";
 import "./shopping.css";
 import LoadState, { type Status } from "../../components/LoadState";
 import { showError } from "../../lib/toast";
+import EditItem from "./EditItem";
 
 type Props = {
   householdId: string;
@@ -17,6 +18,7 @@ type Props = {
 export default function ShoppingList({ householdId }: Props) {
   const [items, setItems] = useState<Item[]>([]);
   const [status, setStatus] = useState<Status>("loading");
+  const [editing, setEditing] = useState<Item | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
 
   const fetchItems = useCallback(() => {
@@ -64,6 +66,20 @@ export default function ShoppingList({ householdId }: Props) {
     setItems(items.filter((i) => !i.done));
   }
 
+  async function saveEdit(changes: Partial<Item>) {
+    if (!editing) return;
+    const { error } = await supabase
+      .from("shopping_items")
+      .update(changes)
+      .eq("id", editing.id);
+    if (error) {
+      showError(error, "Kunde inte spara varan.");
+      return;
+    }
+    setEditing(null);
+    fetchItems();
+  }
+
   function addItem(item: Item) {
     setItems((prev) =>
       prev.some((i) => i.id === item.id) ? prev : [...prev, item],
@@ -108,7 +124,15 @@ export default function ShoppingList({ householdId }: Props) {
       />
     );
   }
-
+  if (editing) {
+    return (
+      <EditItem
+        item={editing}
+        onSave={saveEdit}
+        onCancel={() => setEditing(null)}
+      />
+    );
+  }
   return (
     <>
       <section className="shopping-summary" aria-label="Översikt">
@@ -179,7 +203,12 @@ export default function ShoppingList({ householdId }: Props) {
           </div>
           <ul className="item-list">
             {g.items.map((item) => (
-              <ItemRow key={item.id} item={item} onToggle={toggleItem} />
+              <ItemRow
+                key={item.id}
+                item={item}
+                onToggle={toggleItem}
+                onEdit={setEditing}
+              />
             ))}
           </ul>
         </section>

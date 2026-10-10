@@ -1,15 +1,17 @@
 import type { Item } from "./types";
+import { Pencil } from "lucide-react";
 
 type Props = {
   item: Item;
   onToggle: (item: Item) => void;
+  onEdit: (item: Item) => void;
 };
 
 function formatAmount(amount: number) {
   return String(amount).replace(".", ",");
 }
 
-export default function ItemRow({ item, onToggle }: Props) {
+export default function ItemRow({ item, onToggle, onEdit }: Props) {
   return (
     <li className={item.done ? "item-row done" : "item-row"}>
       <label>
@@ -26,6 +28,14 @@ export default function ItemRow({ item, onToggle }: Props) {
           </span>
         )}
       </label>
+      <button
+        type="button"
+        className="icon-button"
+        aria-label={`Ändra ${item.name}`}
+        onClick={() => onEdit(item)}
+      >
+        <Pencil size={18} aria-hidden />
+      </button>
     </li>
   );
 }

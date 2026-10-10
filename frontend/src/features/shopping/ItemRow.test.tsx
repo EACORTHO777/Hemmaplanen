@@ -17,14 +17,14 @@ const milk: Item = {
 
 describe("ItemRow", () => {
   it("shows the name and amount", () => {
-    render(<ItemRow item={milk} onToggle={() => {}} />);
+    render(<ItemRow item={milk} onToggle={() => {}} onEdit={() => {}} />);
     expect(screen.getByText("Mjölk")).toBeInTheDocument();
     expect(screen.getByText("2 st")).toBeInTheDocument();
   });
 
   it("calls onToggle when the checkbox is clicked", async () => {
     const onToggle = vi.fn();
-    render(<ItemRow item={milk} onToggle={onToggle} />);
+    render(<ItemRow item={milk} onToggle={onToggle} onEdit={() => {}} />);
 
     // The label makes the checkbox findable by the item's name, like a screen reader would
     await userEvent.click(screen.getByRole("checkbox", { name: /mjölk/i }));
@@ -33,7 +33,13 @@ describe("ItemRow", () => {
   });
 
   it("is checked when the item is done", () => {
-    render(<ItemRow item={{ ...milk, done: true }} onToggle={() => {}} />);
+    render(
+      <ItemRow
+        item={{ ...milk, done: true }}
+        onToggle={() => {}}
+        onEdit={() => {}}
+      />,
+    );
     expect(screen.getByRole("checkbox")).toBeChecked();
   });
 });
