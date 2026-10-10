@@ -35,7 +35,8 @@ export const SECTIONS: Section[] = [
   { title: "Kaffe & bakning", short: "Kaffe & bak", color: "#D9C2A7", categories: ["Kaffe", "Bakning"] },
   { title: "Kött & fisk", short: "Kött & fisk", color: "#F2C4BE", categories: ["Kött & fisk"] },
   { title: "Mejeri & frys", short: "Mejeri", color: "#C3D8F0", categories: ["Mejeri", "Frysvaror"] },
-  { title: "Hygien & hushåll", short: "Hygien", color: "#DCD1EE", categories: ["Hygien", "Hushåll", "Leå"] },
+  { title: "Hygien & hushåll", short: "Hygien", color: "#DCD1EE", categories: ["Hygien", "Hushåll"] },
+  { title: "Leå", short: "Leå", color: "#F6D3B3", categories: ["Leå"] },
   { title: "Pasta, ris & ketchup", short: "Pasta & ris", color: "#F0DC9E", categories: ["Pasta", "Ris", "Ketchup"] },
   { title: "Drycker & njiåm", short: "Drycker", color: "#BCE1E3", categories: ["Drycker", "Njiåm"] },
 ];
