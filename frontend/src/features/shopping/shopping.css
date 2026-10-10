@@ -154,16 +154,24 @@
   gap: 6px;
 }
 
+.item-row {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+  border-radius: 18px;
+  background: var(--surface);
+}
+
 .item-row label {
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 14px;
   min-height: 52px;
   padding: 0 14px;
-  border-radius: 18px;
-  background: var(--surface);
   cursor: pointer;
 }
+
 
 .item-name {
   flex: 1;
