@@ -11,13 +11,18 @@ type Props = {
 export default function Edititem({ item, onSave, onCancel }: Props) {
   const [name, setName] = useState(item.name);
   const [category, setCategory] = useState(item.category ?? "");
+  const [amount, setAmount] = useState(item.amount?.toString() ?? "");
 
   return (
     <form
       className="form-card"
       onSubmit={(e) => {
         e.preventDefault();
-        onSave({ name: name.trim(), category: category || null });
+        onSave({
+          name: name.trim(),
+          category: category || null,
+          amount: amount === "" ? null : Number(amount),
+        });
       }}
     >
       <label htmlFor="edit-name">Namn</label>
@@ -26,6 +31,16 @@ export default function Edititem({ item, onSave, onCancel }: Props) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
+      />
+      <label htmlFor="edit-amount">Antal</label>
+      <input
+        id="edit-amount"
+        type="number"
+        inputMode="decimal"
+        min="0"
+        step="any"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
       />
       <label htmlFor="edit-category">Kategori</label>
       <select
