@@ -16,7 +16,7 @@ export const CATEGORIES = [
   "Leå",
   "Pasta",
   "Ris",
-  "Ketchup",
+  "Såser",
   "Drycker",
   "Njiåm",
 ] as const;
@@ -31,13 +31,17 @@ export type Section = {
 // Store walking order, same as the old app. `color` is the light-mode tone;
 // the CSS derives chip, text and ring colors from it for both themes.
 export const SECTIONS: Section[] = [
-  { title: "Frukt & grönt", short: "Frukt", color: "#C9E2B3", categories: ["Frukt & grönt", "Skafferi"] },
+  { title: "Frukt & grönt", short: "Frukt", color: "#C9E2B3", categories: ["Frukt & grönt"] },
+  { title: "Skafferi", short: "Skafferi", color: "#E9DEC8", categories: ["Skafferi"] },
   { title: "Kaffe & bakning", short: "Kaffe & bak", color: "#D9C2A7", categories: ["Kaffe", "Bakning"] },
   { title: "Kött & fisk", short: "Kött & fisk", color: "#F2C4BE", categories: ["Kött & fisk"] },
-  { title: "Mejeri & frys", short: "Mejeri", color: "#C3D8F0", categories: ["Mejeri", "Frysvaror"] },
-  { title: "Hygien & hushåll", short: "Hygien", color: "#DCD1EE", categories: ["Hygien", "Hushåll"] },
+  { title: "Mejeri", short: "Mejeri", color: "#C3D8F0", categories: ["Mejeri"] },
+  { title: "Frys", short: "Frys", color: "#D5DCE6", categories: ["Frysvaror"] },
+  { title: "Hygien", short: "Hygien", color: "#DCD1EE", categories: ["Hygien"] },
+  { title: "Hushåll", short: "Hushåll", color: "#F0D2E2", categories: ["Hushåll"] },
   { title: "Leå", short: "Leå", color: "#F6D3B3", categories: ["Leå"] },
-  { title: "Pasta, ris & ketchup", short: "Pasta & ris", color: "#F0DC9E", categories: ["Pasta", "Ris", "Ketchup"] },
+  { title: "Pasta & ris", short: "Pasta & ris", color: "#F0DC9E", categories: ["Pasta", "Ris"] },
+  { title: "Såser", short: "Såser", color: "#F2B8A2", categories: ["Såser"] },
   { title: "Drycker & njiåm", short: "Drycker", color: "#BCE1E3", categories: ["Drycker", "Njiåm"] },
 ];
 
@@ -74,7 +78,7 @@ const AUTO_RULES: { words: string[]; category: string }[] = [
   { words: ["blöjor", "välling", "barnmat"], category: "Leå" },
   { words: ["pasta", "spagetti", "makaroner", "nudlar"], category: "Pasta" },
   { words: ["ris"], category: "Ris" },
-  { words: ["ketchup", "senap"], category: "Ketchup" },
+  { words: ["ketchup", "senap"], category: "Såser" },
   { words: ["läsk", "juice", "vatten", "öl", "vin", "cola"], category: "Drycker" },
   { words: ["chips", "godis", "choklad", "kakor", "popcorn"], category: "Njiåm" },
 ];
